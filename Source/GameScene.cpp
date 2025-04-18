@@ -63,7 +63,7 @@ void GameScene::initialize()
 		1000.0f		// カメラが映し出すの最遠距離
 	);
 
-	skymap = std::make_unique<Skymap>(deviceMgr->getDevice(), L"Resources/Image/incskies_043_16k.png");
+	skymap = std::make_unique<Skymap>(deviceMgr->getDevice(), L"Resources/Image/Sky.png");
 
 	//	爆発アニメーション付きパーティクル
 	{

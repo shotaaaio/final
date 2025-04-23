@@ -25,6 +25,12 @@
     <Filter Include="Source\Particle">
       <UniqueIdentifier>{9eb5c547-7874-49e5-b8a9-fb9b5ef268f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HLSL\OffScreen">
+      <UniqueIdentifier>{9b44ece1-18d7-462c-a6f4-54df5a48e132}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\PostEffect">
+      <UniqueIdentifier>{7fd4f4be-bd3f-49e9-ab68-8931907abfc7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework.cpp">
@@ -161,6 +167,12 @@
     </ClCompile>
     <ClCompile Include="Source\particle\particle_system.cpp">
       <Filter>Source\Particle</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\FrameBuffer.cpp">
+      <Filter>Source\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\FullScreenQuad.cpp">
+      <Filter>Source\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -314,6 +326,12 @@
     <ClInclude Include="Source\particle\particle_system.h">
       <Filter>Source\Particle</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Graphics\FrameBuffer.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\FullScreenQuad.h">
+      <Filter>Source\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\ImGui.hlsli">
@@ -336,6 +354,12 @@
     </None>
     <None Include="HLSL\geometry_particle.hlsli">
       <Filter>HLSL</Filter>
+    </None>
+    <None Include="HLSL\FullScreenQuad.hlsli">
+      <Filter>HLSL\OffScreen</Filter>
+    </None>
+    <None Include="HLSL\FilterFunctions.hlsli">
+      <Filter>HLSL\PostEffect</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -383,6 +407,24 @@
     </FxCompile>
     <FxCompile Include="HLSL\geometry_particle_vs.hlsl">
       <Filter>HLSL</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\FullScreenQuadPS.hlsl">
+      <Filter>HLSL\OffScreen</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\FullScreenQuadVS.hlsl">
+      <Filter>HLSL\OffScreen</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\ColorFilterPS.hlsl">
+      <Filter>HLSL\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\LuminanceBlurPS.hlsl">
+      <Filter>HLSL\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\LuminanceExtractPS.hlsl">
+      <Filter>HLSL\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="HLSL\VignettePS.hlsl">
+      <Filter>HLSL\PostEffect</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -11,6 +11,10 @@
 #include "Graphics/Skymap.h"
 #include "particle/particle_system.h"
 
+#include "Graphics/FrameBuffer.h"
+#include "Graphics/FullScreenQuad.h"
+#include "misc.h"
+
 // ÉQÅ[ÉÄÉVÅ[Éì
 class GameScene :public Scene
 {
@@ -62,4 +66,65 @@ private:
 	DirectX::XMFLOAT3 options = { 0.5f,0.3f,5.0f };
 	DirectX::XMFLOAT3 idealPos;
 	float damp = 2.0f;
+
+	std::unique_ptr<FrameBuffer> frameBuffers[8];
+	std::unique_ptr<FullScreenQuad> bitBlockTransfer;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> pixel_shader[8];
+
+	int postEffectIndex = 0;
+
+	struct LuminanceExtract
+	{
+		DirectX::XMFLOAT3 luminanceColor{ 0.0f, 0.0f, 0.0f };
+		float threshold = { 0.5f };
+		float intensity = { 1.0f };
+		int luminance_use_flag = 0;
+		int blur_use_flag = 0;
+		float dummy;
+	};
+	LuminanceExtract luminance;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> luminancebuffer;
+
+	struct VignetteData
+	{
+		DirectX::XMFLOAT4 vignette_color = { 0.2f, 0.2f, 0.2f, 1.0f };
+		DirectX::XMFLOAT2 vignette_center = { 0.5f, 0.5f };
+		float vignette_intensity = 0.5f;
+		float vignette_smoothness = 0.2f;
+
+		bool vignette_rounded = false;
+		float vignette_roundness = 0.85f;
+		bool vignette_compute_flag = false;
+	};
+	VignetteData vignettedata;
+	struct VignetteConstants
+	{
+		DirectX::XMFLOAT4 vignette_color;
+		DirectX::XMFLOAT2 vignette_center;
+		float vignette_intensity;
+		float vignette_smoothness;
+
+		float vignette_rounded;
+		float vignette_roundness;
+		DirectX::XMFLOAT2 vignette_dummy;
+	};
+	VignetteConstants vignette;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> vignettebuffer;
+
+	struct ColorFilter
+	{
+		DirectX::XMFLOAT4 filterColor{ 1.0f, 1.0f, 1.0f, 1.0f };
+		float hueShift = 0.0f;
+		float saturation = 2.0f;
+		float brightness = 1.0f;
+		float dummy;
+	};
+	ColorFilter colorfilter;
+	Microsoft::WRL::ComPtr<ID3D11Buffer> colorfilterbuffer;
+	DirectX::XMFLOAT4 colorfilterparameter{ 0.0f, 1.0f, 1.0f, 0.0f };
+
+private:
+	void CreateShader(ID3D11Device* device);
+	void UsePostEffect(ID3D11DeviceContext* dc, int index);
+	void ComputeVignette();
 };

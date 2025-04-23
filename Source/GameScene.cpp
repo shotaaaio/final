@@ -12,6 +12,7 @@
 
 #include "Graphics/Texture.h"
 #include "Mathf.h"
+#include "Framework.h"
 
 // 初期化
 void GameScene::initialize()
@@ -20,6 +21,10 @@ void GameScene::initialize()
 
 	// シーン定数バッファの作成
 	createBuffer<GameScene::SceneConstants>(DeviceManager::instance()->getDevice(), buffer.GetAddressOf());
+	//それぞれのポストエフェクト定数バッファの生成
+	createBuffer<GameScene::SceneConstants>(DeviceManager::instance()->getDevice(), luminancebuffer.GetAddressOf());
+	createBuffer<GameScene::SceneConstants>(DeviceManager::instance()->getDevice(), vignettebuffer.GetAddressOf());
+	createBuffer<GameScene::SceneConstants>(DeviceManager::instance()->getDevice(), colorfilterbuffer.GetAddressOf());
 
 	//ステージの作成
 	stage = std::make_unique<Stage>();
@@ -76,6 +81,13 @@ void GameScene::initialize()
 		//	パーティクルシステム生成
 		particle_bomb = std::make_unique<ParticleSystem>(deviceMgr->getDevice(), shader_resource_view, 5, 5);
 	}
+
+	frameBuffers[0] = std::make_unique<FrameBuffer>(deviceMgr->getDevice(), static_cast<uint32_t>(SCREEN_WIDTH), static_cast<uint32_t>(SCREEN_HEIGHT));
+	frameBuffers[1] = std::make_unique<FrameBuffer>(deviceMgr->getDevice(), static_cast<uint32_t>(SCREEN_WIDTH / 2), static_cast<uint32_t>(SCREEN_HEIGHT / 2));
+	frameBuffers[2] = std::make_unique<FrameBuffer>(deviceMgr->getDevice(), static_cast<uint32_t>(SCREEN_WIDTH), static_cast<uint32_t>(SCREEN_HEIGHT));
+	frameBuffers[3] = std::make_unique<FrameBuffer>(deviceMgr->getDevice(), static_cast<uint32_t>(SCREEN_WIDTH), static_cast<uint32_t>(SCREEN_HEIGHT));
+	bitBlockTransfer = std::make_unique<FullScreenQuad>(deviceMgr->getDevice());
+	CreateShader(deviceMgr->getDevice());
 }
 
 // 終了処理
@@ -140,6 +152,11 @@ void GameScene::update(float elapsedTime)
 	//エフェクトの更新
 	EffectManager::instance()->update(elapsedTime);
 
+	//周辺減光の更新
+	if (vignettedata.vignette_compute_flag)
+	{
+		ComputeVignette();
+	}
 
 	////	パーティクルシステム更新
 	//if (particle_bomb)
@@ -202,47 +219,64 @@ void GameScene::render()
 	// 3D 描画に利用する定数バッファの更新と設定
 	bindBuffer(dc, 1, buffer.GetAddressOf(), &sc);
 
-	//スカイマップ
-	graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc) {
-		// サンプラーステートの設定（アニソトロピック）
-		dc->PSSetSamplers(0, 1, rc->samplerStates[static_cast<uint32_t>(SAMPLER_STATE::ANISOTROPIC)].GetAddressOf());
-		// ブレンドステートの設定（アルファ）
-		dc->OMSetBlendState(rc->blendStates[static_cast<uint32_t>(BLEND_STATE::ALPHABLENDING)].Get(), nullptr, 0xFFFFFFFF);
-		// 深度ステンシルステートの設定（深度テストオン、深度書き込みオフ）
-		dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::ON_OFF)].Get(), 0);
-		// ラスタライザステートの設定（ソリッド、裏面表示オフ）
-		dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
-		});
+	bindBuffer(dc, 5, luminancebuffer.GetAddressOf(), &luminance);
+	bindBuffer(dc, 6, vignettebuffer.GetAddressOf(), &vignette);
+	bindBuffer(dc, 7, colorfilterbuffer.GetAddressOf(), &colorfilter);
+
+	//オフスクリーンレンダリング指定区間
 	{
-		DirectX::XMFLOAT4X4 inverse_view_projection;
-		//カメラの逆行列
-		DirectX::XMStoreFloat4x4(&inverse_view_projection, DirectX::XMMatrixInverse(nullptr, View * Projection));
-		skymap->Render(dc,camera->getEye(),inverse_view_projection);
+		frameBuffers[0]->clear(dc);
+		frameBuffers[0]->activate(dc);
+		//スカイマップ
+		graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc) {
+			// サンプラーステートの設定（アニソトロピック）
+			dc->PSSetSamplers(0, 1, rc->samplerStates[static_cast<uint32_t>(SAMPLER_STATE::ANISOTROPIC)].GetAddressOf());
+			// ブレンドステートの設定（アルファ）
+			dc->OMSetBlendState(rc->blendStates[static_cast<uint32_t>(BLEND_STATE::ALPHABLENDING)].Get(), nullptr, 0xFFFFFFFF);
+			// 深度ステンシルステートの設定（深度テストオン、深度書き込みオフ）
+			dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::ON_OFF)].Get(), 0);
+			// ラスタライザステートの設定（ソリッド、裏面表示オフ）
+			dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
+			});
+		{
+			DirectX::XMFLOAT4X4 inverse_view_projection;
+			//カメラの逆行列
+			DirectX::XMStoreFloat4x4(&inverse_view_projection, DirectX::XMMatrixInverse(nullptr, View * Projection));
+			skymap->Render(dc, camera->getEye(), inverse_view_projection);
+		}
+
+		// 3D 描画設定
+		graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc) {
+			// サンプラーステートの設定（アニソトロピック）
+			dc->PSSetSamplers(0, 1, rc->samplerStates[static_cast<uint32_t>(SAMPLER_STATE::ANISOTROPIC)].GetAddressOf());
+			// ブレンドステートの設定（アルファ）
+			dc->OMSetBlendState(rc->blendStates[static_cast<uint32_t>(BLEND_STATE::ALPHABLENDING)].Get(), nullptr, 0xFFFFFFFF);
+			// 深度ステンシルステートの設定（深度テストオン、深度書き込みオン）
+			dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::ON_ON)].Get(), 0);
+			// ラスタライザステートの設定（ソリッド、裏面表示オフ）
+			dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
+			});
+
+		// 3D 描画
+		{
+			//ステージの描画
+			stage->render(dc);
+
+			//プレイヤーの描画
+			player->render(dc);
+
+			//敵描画処理
+			EnemyManager::instance()->render(dc);
+		}
+
+		frameBuffers[0]->deactivate(dc);
+
+		UsePostEffect(dc, postEffectIndex);
+
 	}
 
-	// 3D 描画設定
-	graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc){
-		// サンプラーステートの設定（アニソトロピック）
-		dc->PSSetSamplers(0, 1, rc->samplerStates[static_cast<uint32_t>(SAMPLER_STATE::ANISOTROPIC)].GetAddressOf());
-		// ブレンドステートの設定（アルファ）
-		dc->OMSetBlendState(rc->blendStates[static_cast<uint32_t>(BLEND_STATE::ALPHABLENDING)].Get(), nullptr, 0xFFFFFFFF);
-		// 深度ステンシルステートの設定（深度テストオン、深度書き込みオン）
-		dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::ON_ON)].Get(), 0);
-		// ラスタライザステートの設定（ソリッド、裏面表示オフ）
-		dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
-	});
-
-	// 3D 描画
-	{
-		//ステージの描画
-		stage->render(dc);
-
-		//プレイヤーの描画
-		player->render(dc);
-
-		//敵描画処理
-		EnemyManager::instance()->render(dc);
-	}
+	//深度ステンシル書き換え
+	dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	//3Dエフェクト描画
 	{
@@ -304,6 +338,42 @@ void GameScene::render()
 		ImGui::SliderFloat3("options", &options.x, -5.0f, 5.0f);
 		ImGui::InputFloat3("camera position", &eye.x);
 		ImGui::SliderFloat("damp", &damp, 2.0f, 5.0f);
+
+		ImGui::SliderInt("post effect index", &postEffectIndex, 0, 3);
+
+		if (ImGui::TreeNode("Bloom"))
+		{
+			ImGui::ColorEdit3("luminance color", &luminance.luminanceColor.x);
+			ImGui::SliderFloat("luminance threshold", &luminance.threshold, 0.0f, 1.0f);
+			ImGui::SliderFloat("luminanse intencity", &luminance.intensity, 0.0f, 10.0f);
+
+			ImGui::SliderInt("luminance flag", &luminance.luminance_use_flag, 0, 1);
+			ImGui::SliderInt("blur flag", &luminance.blur_use_flag, 0, 1);
+			ImGui::TreePop();
+		}
+		ImGui::Separator();
+
+		if (ImGui::TreeNode("Vignette"))
+		{
+			ImGui::ColorEdit3("vignette color", &vignettedata.vignette_color.x);
+			ImGui::SliderFloat2("vignette center", &vignettedata.vignette_center.x, 0.0f, 1.0f);
+			ImGui::SliderFloat("vignette intensity", &vignettedata.vignette_intensity, 0.0f, 1.0f);
+			ImGui::SliderFloat("vignette smoothness", &vignettedata.vignette_smoothness, 0.0f, 1.0f);
+			ImGui::Checkbox("vignette rounded", &vignettedata.vignette_rounded);
+			ImGui::SliderFloat("vignette roundness", &vignettedata.vignette_roundness, 0.0f, 1.0f);
+			ImGui::TreePop();
+		}
+		ImGui::Separator();
+
+		if (ImGui::TreeNode("ColorFilter"))
+		{
+			ImGui::ColorEdit3("filter color", &colorfilter.filterColor.x);
+			ImGui::SliderFloat("filter hueshift", &colorfilter.hueShift, 0.0f, 360.0f);
+			ImGui::SliderFloat("filter saturate", &colorfilter.saturation, 0.0f, 2.0f);
+			ImGui::SliderFloat("filter brightness", &colorfilter.brightness, 0.0f, 2.0f);
+			ImGui::TreePop();
+		}
+		ImGui::Separator();
 		ImGui::End();
 	}
 }
@@ -456,4 +526,43 @@ void GameScene::enemyPlacementByTouch(ID3D11DeviceContext* dc)
 
 
 	}
+}
+
+void GameScene::CreateShader(ID3D11Device* device)
+{
+	ShaderManager::instance()->createPsFromCso(device, ".\\Shader\\LuminanceExtractPS.cso", pixel_shader[0].GetAddressOf());
+	ShaderManager::instance()->createPsFromCso(device, ".\\Shader\\LuminanceBlurPS.cso", pixel_shader[1].GetAddressOf());
+	ShaderManager::instance()->createPsFromCso(device, ".\\Shader\\VignettePS.cso", pixel_shader[2].GetAddressOf());
+	ShaderManager::instance()->createPsFromCso(device, ".\\Shader\\ColorFilterPS.cso", pixel_shader[3].GetAddressOf());
+}
+
+void GameScene::UsePostEffect(ID3D11DeviceContext* dc, int index)
+{
+	if (index <= 0)
+	{
+		bitBlockTransfer->blit(dc, frameBuffers[0]->shader_resource_views[0].GetAddressOf(), 0, 1);
+		return;//インデックス番号0番はオフスクリーンレンダリングなので描画だけしてスキップ
+	}
+
+	if (index == 2) { vignettedata.vignette_compute_flag = true; }
+	else { vignettedata.vignette_compute_flag = false; }
+
+	frameBuffers[index]->clear(dc);
+	frameBuffers[index]->activate(dc);
+	bitBlockTransfer->blit(dc, frameBuffers[0]->shader_resource_views[0].GetAddressOf(), 0, 1, pixel_shader[0].Get());
+	frameBuffers[index]->deactivate(dc);
+	ID3D11ShaderResourceView* shader_resourse_views[2]
+	{ frameBuffers[0]->shader_resource_views[0].Get(),
+		frameBuffers[index]->shader_resource_views[0].Get() };
+	bitBlockTransfer->blit(dc, shader_resourse_views, 0, 2, pixel_shader[index].Get());
+}
+
+void GameScene::ComputeVignette()
+{
+	vignette.vignette_color = vignettedata.vignette_color;
+	vignette.vignette_center = vignettedata.vignette_center;
+	vignette.vignette_intensity = vignettedata.vignette_intensity * 3.0f;
+	vignette.vignette_smoothness = max(0.000001f, vignettedata.vignette_smoothness);
+	vignette.vignette_rounded = vignettedata.vignette_rounded ? 1.0f : 0.0f;
+	vignette.vignette_roundness = 6.0f * (1.0f - vignettedata.vignette_roundness);
 }

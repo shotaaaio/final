@@ -137,3 +137,41 @@ void EnemyManager::remove(Enemy* enemy)
 	//”jŠüƒŠƒXƒg‚É’Ç‰Á
 	removeArray.push_back(enemy);
 }
+
+Enemy* EnemyManager::getEnemyByRay(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd)
+{
+	DirectX::XMVECTOR startVec = DirectX::XMLoadFloat3(&rayStart);
+	DirectX::XMVECTOR endVec = DirectX::XMLoadFloat3(&rayEnd);
+	DirectX::XMVECTOR rayDir = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(endVec, startVec));
+
+	float closestDist = FLT_MAX;
+	Enemy* closestEnemy = nullptr;
+
+	for (int i = 0; i < getEnemyCount(); ++i)
+	{
+		Enemy* enemy = getEnemy(i);
+		DirectX::XMFLOAT3 enemyPos = *enemy->getPosition();
+		DirectX::XMVECTOR enemyVec = DirectX::XMLoadFloat3(&enemyPos);
+
+		DirectX::XMVECTOR toEnemyVec = DirectX::XMVectorSubtract(enemyVec, startVec);
+		float t;
+		DirectX::XMStoreFloat(&t, DirectX::XMVector3Dot(toEnemyVec, rayDir));
+
+		if (t < 0)
+			continue;
+
+		DirectX::XMVECTOR closestPoint = DirectX::XMVectorAdd(startVec, DirectX::XMVectorScale(rayDir, t));
+		DirectX::XMVECTOR diffVec = DirectX::XMVectorSubtract(enemyVec, closestPoint);
+
+		float distSq;
+		DirectX::XMStoreFloat(&distSq, DirectX::XMVector3LengthSq(diffVec));
+
+		float radius = enemy->getRadius();
+		if (distSq <= radius * radius && t < closestDist)
+		{
+			closestDist = t;
+			closestEnemy = enemy;
+		}
+	}
+	return closestEnemy;
+}

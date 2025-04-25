@@ -6,7 +6,7 @@ class Mathf
 {
 public:
 	//üŒ`•âŠ®
-	static float Leap(float a, float b, float t);
+	static float Lerp(float a, float b, float t);
 	static DirectX::XMFLOAT3 Leap(DirectX::XMFLOAT3 pos, DirectX::XMFLOAT3 target, float t);
 
 	//Š„‡

@@ -162,6 +162,27 @@
     <ClCompile Include="Source\particle\particle_system.cpp">
       <Filter>Source\Particle</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GameScene2.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ObjManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Obj.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Ivy.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\EnemyPlantune.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Trash.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Goal.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Framework.h">
@@ -311,8 +332,29 @@
     <ClInclude Include="Source\Mathf.h">
       <Filter>Source</Filter>
     </ClInclude>
+    <ClInclude Include="Source\GameScene2.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ObjManager.h">
+      <Filter>Source</Filter>
+    </ClInclude>
     <ClInclude Include="Source\particle\particle_system.h">
       <Filter>Source\Particle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Obj.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Ivy.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\EnemyPlantune.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Trash.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Goal.h">
+      <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

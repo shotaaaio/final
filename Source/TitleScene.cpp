@@ -4,7 +4,9 @@
 #include"Input/InputManager.h"
 #include"SceneManager.h"
 #include"GameScene.h"
+#include"GameScene2.h"
 #include"LoadingScene.h"
+#include "imgui.h"
 
 
 //初期化処理
@@ -26,10 +28,10 @@ void TitleScene::update(float elapsedTime)
 	GamePad* gamePad = InputManager::instance()->getGamePad();
 
 	//ボタンを押したらゲームシーンに遷移
-	if (gamePad->getButtonDown() & GamePad::BTN_A)
+	/*if (gamePad->getButtonDown() & GamePad::BTN_A)
 	{
 		SceneManager::instance()->changeScene(new LoadingScene(new GameScene));
-	}
+	}*/
 }
 
 //描画処理
@@ -69,4 +71,18 @@ void TitleScene::render()
 			0, 0, 1280, 720
 		);
 	}
+
+	// サーバーと接続
+	if (ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_None))
+	{
+		if (ImGui::Button(u8"Stage:1"))
+		{
+			SceneManager::instance()->changeScene(new LoadingScene(new GameScene));
+		}
+		if (ImGui::Button(u8"Stage:2"))
+		{
+			SceneManager::instance()->changeScene(new LoadingScene(new GameScene2));
+		}
+	}
+	ImGui::End();
 }

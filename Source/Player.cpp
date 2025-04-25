@@ -10,6 +10,10 @@
 #include"StraightBullet.h"
 #include"HomingBullet.h"
 #include"Mathf.h"
+#include "ObjManager.h"
+#include "Ivy.h"
+#include "Graphics/Sprite.h"
+#include "Goal.h"
 
 //コンストラクタ
 Player::Player()
@@ -33,6 +37,16 @@ Player::Player()
 	Key_v = std::bind(&Player::FlyingHomingBullet,this);
 	Key_z = std::bind(&Player::JumpAction, this);
 	Key_x = std::bind(&Player::Attack, this);
+
+	shizukuImage = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Image\\shizuku.png");
+
+	wakuImage = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Image\\waku.png");
+
+	sakuImage = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Image\\柵.png");
+
+	whiteImage = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Image\\white.jpg");
+
+	clearText = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Font\\clear.png");
 }
 
 //デストラクタ
@@ -43,6 +57,11 @@ Player::~Player()
 //更新処理
 void Player::update(float elapsedTime)
 {
+	if (!move_b) {
+		updateTransform();
+		return;
+	}
+
 	if (!isPlayAnimation())
 	{
 		playAnimation(0, true);
@@ -66,6 +85,10 @@ void Player::update(float elapsedTime)
 	//敵と弾の衝突判定
 	collisionBulletAndEnemies();
 
+	Hashigo();
+
+	inGoal();
+
 	//アニメーションの更新
 	updateAnimation(elapsedTime);
 
@@ -79,6 +102,75 @@ void Player::update(float elapsedTime)
 void Player::render(ID3D11DeviceContext* dc)
 {
 	model->render(dc, transform, { 1.0f,1.0f,1.0f,1.0f }, &keyframe);
+
+	if (attack_count >= 10)
+	{
+		shizukuImage->render(dc,
+			600, 550, 100, 100,
+			1, 1, 1, 1,
+			0,
+			0, 0, 768, 768
+		);
+
+		wakuImage->render(dc,
+			565, 540, 170, 130,
+			1, 1, 1, 1,
+			0,
+			0, 0, 800, 600
+		);
+	}
+
+	if (IsGoal)
+	{
+		if (white_a <= 0.5)white_a += 0.002;
+
+		whiteImage->render(dc,
+			0, 0, 1280, 720,
+			1, 1, 1, white_a,
+			0,
+			0, 0, 850, 478
+		);
+
+		for (int i = 0; i < 10; i++)
+		{
+			posY1 += 0.5;
+			posYMax = posY1 - (100 * (i + 1));
+			if (posYMax >= 0) posYMax = 0;
+			sakuImage->render(dc,
+				140 * i - 50, posYMax, 200, 500,
+				1, 1, 1, 1,
+				180,
+				-170, -290, 1200, 1200
+			);
+		}
+
+		for (int i = 0; i < 10; i++)
+		{
+			posY2 -= 0.5;
+			posYMax = posY2 + (100 * (i + 1));
+			if (posYMax <= 470)
+			{
+				posYMax = 470;
+				if (i == 9) clear_b = true;
+			}
+			sakuImage->render(dc,
+				140 * (9 - i) - 50, posYMax, 200, 500,
+				1, 1, 1, 1,
+				0,
+				170, 300, 1200, 1200
+			);
+		}
+
+		if (clear_b) {
+			if (clearTime <= 1) clearTime += 0.01f;
+			clearText->render(dc,
+				440, 310, 400, 76,
+				1, 1, 1, clearTime,
+				0,
+				0, 0, 171, 38
+			);
+		}
+	}
 
 	//弾描画処理
 	bulletMgr.render(dc);
@@ -124,7 +216,6 @@ void Player::drawDrawPrimitive()
 		1.0f,
 		DirectX::XMFLOAT4(1, 0, 0, 1)
 	);
-
 }
 
 //入力値から移動ベクトルを取得
@@ -175,14 +266,21 @@ DirectX::XMFLOAT3 Player::getMoveVec()const
 
 void Player::InputMove(float elapsedTime)
 {
-	//進行ベクトル取得
-	DirectX::XMFLOAT3 moveVec = getMoveVec();
+	if (!isOnLadder)
+	{
+		//進行ベクトル取得
+		DirectX::XMFLOAT3 moveVec = getMoveVec();
 
-	//移動処理
-	Move(moveVec.x, moveVec.z, moveSpeed);
+		//移動処理
+		Move(moveVec.x, moveVec.z, moveSpeed);
 
-	//旋回処理
-	turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+		//旋回処理
+		turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+	}
+	else
+	{
+		Move(0, 0, 0);
+	}
 }
 
 //プレイヤーと敵との衝突判定
@@ -210,10 +308,25 @@ void Player::collisionPlayerAndEnemies()
 			outVec
 		))
 		{
-			float closs = (position.y * (enemy->getPosition()->z)) - (position.z * (enemy->getPosition()->y));
-			if (closs > 0.0f)
+			// プレイヤーの下端の高さ
+			float playerBottom = position.y;
+			float enemyTop = enemy->getPosition()->y + enemy->getHeight() * 0.5f;
+
+			float verticalVelocity = velocity.y; // プレイヤーのY方向速度が必要（下に落ちてきてるか）
+
+			// 踏みつけと判定する条件
+			if (playerBottom > enemyTop && verticalVelocity < -0.1f)
 			{
 				jump(jumpSpeed * 0.5f);
+				attack_count++;
+
+				int damage = 2; // 仮のダメージとして１
+				if (InputManager::instance()->attack)
+				{
+					if (enemy->applyDamage(damage, 0.1f))
+					{
+					}
+				}
 			}
 			else
 			{
@@ -363,4 +476,135 @@ void Player::onLanding()
 {
 	jumpCount = 0;
 	Effekseer::Handle handle = hitEffect->play(&position, 0.5f);
+}
+
+void Player::Hashigo()
+{
+	ObjManager* eneMgr = ObjManager::instance();
+
+	int enemyCount = eneMgr->getObjCount();
+	isOnLadder = false;
+	for (int i = 0; i < enemyCount; i++)
+	{
+		Obj* enemy = eneMgr->getObj(i);
+
+		Ivy* ivy = dynamic_cast<Ivy*>(enemy);
+		if (ivy)
+		{
+			DirectX::XMFLOAT3 outVec;
+
+			if (Collision::intersectCylinderAndCylinder(position, radius, height, *ivy->getPosition(), ivy->getRadius(), ivy->getHeight(), outVec))
+			{
+
+				DirectX::XMFLOAT3 toIvyVec = {
+				ivy->getPosition()->x - position.x,
+				0.0f,
+				ivy->getPosition()->z - position.z
+				};
+
+				// スティックの入力
+				GamePad* gamePad = InputManager::instance()->getGamePad();
+				float ax = gamePad->getAxisLX();
+				float ay = gamePad->getAxisLY();
+
+				// 正規化
+				DirectX::XMVECTOR inputVec = DirectX::XMVector3Normalize(DirectX::XMVectorSet(ax, 0, ay, 0));
+				DirectX::XMVECTOR toIvy = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&toIvyVec));
+
+				// 入力ベクトルがツタの方向と近ければ上昇
+				float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(inputVec, toIvy));
+				if ((ax != 0 || ay != 0) && dot > 0.7f)
+				{
+					isOnLadder = true;
+					velocity.x = 0;
+					velocity.y = 2;
+					velocity.z = 0;
+				}
+				else
+				{
+					velocity.y = 0;
+				}
+
+				if (attack_count >= 10)
+				{
+					if (GetKeyState('F') < 0)
+					{
+						DirectX::XMFLOAT3 eneScale = *enemy->getScale();
+						eneScale.y = 0.01f;
+						eneScale.z = 0.01f;
+						enemy->setScale(eneScale);
+						enemy->setHeight(7);
+					}
+				}
+
+				////Search();
+
+				//search_b = true;
+			}
+			/*else
+				search_b = false;*/
+		}
+		else
+		{
+			DirectX::XMFLOAT3 outVec;
+
+			if (Collision::intersectCylinderAndCylinder(position, radius, height, *enemy->getPosition(), enemy->getRadius(), enemy->getHeight(), outVec))
+			{
+
+				DirectX::XMFLOAT3 toEnemyVec = {
+				enemy->getPosition()->x - position.x,
+				0.0f,
+				enemy->getPosition()->z - position.z
+				};
+
+				// スティックの入力
+				GamePad* gamePad = InputManager::instance()->getGamePad();
+				float ax = gamePad->getAxisLX();
+				float ay = gamePad->getAxisLY();
+
+				// 正規化
+				DirectX::XMVECTOR inputVec = DirectX::XMVector3Normalize(DirectX::XMVectorSet(ax, 0, ay, 0));
+				DirectX::XMVECTOR toIvy = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&toEnemyVec));
+
+				// 入力ベクトルがツタの方向と近ければ上昇
+				float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(inputVec, toIvy));
+				if ((ax != 0 || ay != 0) && dot > 0.7f)
+				{
+					isOnLadder = true;
+					velocity.x = 0;
+					velocity.y = 0;
+					velocity.z = 0;
+				}
+				else
+				{
+					velocity.y = 0;
+				}
+			}
+		}
+	}
+}
+
+void Player::inGoal()
+{
+	ObjManager* eneMgr = ObjManager::instance();
+
+	int enemyCount = eneMgr->getObjCount();
+
+	for (int i = 0; i < enemyCount; i++)
+	{
+		Obj* enemy = eneMgr->getObj(i);
+
+		Goal* ivy = dynamic_cast<Goal*>(enemy);
+		if (ivy)
+		{
+			DirectX::XMFLOAT3 outVec;
+
+			if (Collision::intersectCylinderAndCylinder(position, radius, height, *ivy->getPosition(), ivy->getRadius(), ivy->getHeight(), outVec))
+			{
+				IsGoal = true;
+				move_b = false;
+				//SceneManager::instance()->changeScene(new SceneClear);
+			}
+		}
+	}
 }

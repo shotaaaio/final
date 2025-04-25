@@ -44,6 +44,8 @@ public:
 
 	//“Gíœ
 	void remove(Enemy* enemy);
+
+	Enemy* getEnemyByRay(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd);
 private:
 	std::vector<Enemy*>enemyArray;
 	std::vector<Enemy*>removeArray;

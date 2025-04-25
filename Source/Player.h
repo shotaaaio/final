@@ -49,6 +49,10 @@ protected:
 private:
 	//入力値から移動ベクトルを取得
 	DirectX::XMFLOAT3 getMoveVec()const;
+
+	void Hashigo();
+
+	void inGoal();
 private:
 	//移動スピード
 	float moveSpeed = 5.0f;
@@ -80,6 +84,25 @@ private:
 	std::function<void()> Key_v;
 	std::function<void()> Key_z;
 	std::function<void()> Key_x;
+
+	bool isOnLadder;
+
+	int attack_count = 0;
+
+	bool IsGoal = false;//true...ゴールした
+
+	bool move_b = true;//true...プレイヤーが動ける
+
+	float posY1 = 0.0f;//クリア演出用
+	float posY2 = 720.0f;//クリア演出用
+
+	float posYMax = 0.0f;//クリア演出用
+
+	float white_a = 0.0f;//クリア演出用
+
+	bool clear_b = false;//クリア演出用
+
+	float clearTime = 0.0f;//クリア演出用
 };
 
 enum class NodeState

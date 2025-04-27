@@ -5,6 +5,7 @@
 #include"SceneManager.h"
 #include"GameScene.h"
 #include"GameScene2.h"
+#include"GameScene3.h"
 #include"LoadingScene.h"
 #include "imgui.h"
 
@@ -82,6 +83,10 @@ void TitleScene::render()
 		if (ImGui::Button(u8"Stage:2"))
 		{
 			SceneManager::instance()->changeScene(new LoadingScene(new GameScene2));
+		}
+		if (ImGui::Button(u8"Stage:3"))
+		{
+			SceneManager::instance()->changeScene(new LoadingScene(new GameScene3));
 		}
 	}
 	ImGui::End();

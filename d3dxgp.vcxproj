@@ -181,6 +181,7 @@
     <ClCompile Include="Source\Framework.cpp" />
     <ClCompile Include="Source\GameScene.cpp" />
     <ClCompile Include="Source\GameScene2.cpp" />
+    <ClCompile Include="Source\GameScene3.cpp" />
     <ClCompile Include="Source\Goal.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\GraphicsManager.cpp" />
@@ -235,6 +236,7 @@
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\GameScene.h" />
     <ClInclude Include="Source\GameScene2.h" />
+    <ClInclude Include="Source\GameScene3.h" />
     <ClInclude Include="Source\Goal.h" />
     <ClInclude Include="Source\Graphics\Buffer.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer.h" />

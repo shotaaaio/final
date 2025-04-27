@@ -42,14 +42,4 @@ protected:
 
 	//ƒ‚ƒfƒ‹
 	std::unique_ptr<SkinnedMesh>model;
-
-	std::unique_ptr<Sprite> shizukuImage;
-
-	std::unique_ptr<Sprite> wakuImage;
-
-	std::unique_ptr<Sprite> sakuImage;
-
-	std::unique_ptr<Sprite> whiteImage;
-
-	std::unique_ptr<Sprite> clearText;
 };

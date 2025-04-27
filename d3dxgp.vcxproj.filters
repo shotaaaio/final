@@ -183,6 +183,9 @@
     <ClCompile Include="Source\Goal.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="Source\GameScene3.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Framework.h">
@@ -354,6 +357,9 @@
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Source\Goal.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\GameScene3.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>

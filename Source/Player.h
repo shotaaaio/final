@@ -103,6 +103,16 @@ private:
 	bool clear_b = false;//クリア演出用
 
 	float clearTime = 0.0f;//クリア演出用
+
+	std::unique_ptr<Sprite> shizukuImage;
+
+	std::unique_ptr<Sprite> wakuImage;
+
+	std::unique_ptr<Sprite> sakuImage;
+
+	std::unique_ptr<Sprite> whiteImage;
+
+	std::unique_ptr<Sprite> clearText;
 };
 
 enum class NodeState

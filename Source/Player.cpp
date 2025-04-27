@@ -550,7 +550,6 @@ void Player::Hashigo()
 
 			if (Collision::intersectCylinderAndCylinder(position, radius, height, *enemy->getPosition(), enemy->getRadius(), enemy->getHeight(), outVec))
 			{
-
 				DirectX::XMFLOAT3 toEnemyVec = {
 				enemy->getPosition()->x - position.x,
 				0.0f,

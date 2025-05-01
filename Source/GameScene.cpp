@@ -202,23 +202,29 @@ void GameScene::render()
 	// 3D 描画に利用する定数バッファの更新と設定
 	bindBuffer(dc, 1, buffer.GetAddressOf(), &sc);
 
-	//スカイマップ
-	graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc) {
-		// サンプラーステートの設定（アニソトロピック）
-		dc->PSSetSamplers(0, 1, rc->samplerStates[static_cast<uint32_t>(SAMPLER_STATE::ANISOTROPIC)].GetAddressOf());
-		// ブレンドステートの設定（アルファ）
-		dc->OMSetBlendState(rc->blendStates[static_cast<uint32_t>(BLEND_STATE::ALPHABLENDING)].Get(), nullptr, 0xFFFFFFFF);
-		// 深度ステンシルステートの設定（深度テストオン、深度書き込みオフ）
-		dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::ON_OFF)].Get(), 0);
-		// ラスタライザステートの設定（ソリッド、裏面表示オフ）
-		dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
-		});
+	
+	post_effect->UpdateBuffer(dc);
+	
+	//オフスクリーンレンダリング指定区間
 	{
-		DirectX::XMFLOAT4X4 inverse_view_projection;
-		//カメラの逆行列
-		DirectX::XMStoreFloat4x4(&inverse_view_projection, DirectX::XMMatrixInverse(nullptr, View * Projection));
-		skymap->Render(dc,camera->getEye(),inverse_view_projection);
-	}
+		post_effect->OffScreenStart(dc);
+		//スカイマップ
+		graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc) {
+			// サンプラーステートの設定（アニソトロピック）
+			dc->PSSetSamplers(0, 1, rc->samplerStates[static_cast<uint32_t>(SAMPLER_STATE::ANISOTROPIC)].GetAddressOf());
+			// ブレンドステートの設定（アルファ）
+			dc->OMSetBlendState(rc->blendStates[static_cast<uint32_t>(BLEND_STATE::ALPHABLENDING)].Get(), nullptr, 0xFFFFFFFF);
+			// 深度ステンシルステートの設定（深度テストオン、深度書き込みオフ）
+			dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::ON_OFF)].Get(), 0);
+			// ラスタライザステートの設定（ソリッド、裏面表示オフ）
+			dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
+			});
+		{
+			DirectX::XMFLOAT4X4 inverse_view_projection;
+			//カメラの逆行列
+			DirectX::XMStoreFloat4x4(&inverse_view_projection, DirectX::XMMatrixInverse(nullptr, View * Projection));
+			skymap->Render(dc, camera->getEye(), inverse_view_projection);
+		}
 
 	// 3D 描画設定
 	graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc){
@@ -240,8 +246,14 @@ void GameScene::render()
 		//プレイヤーの描画
 		player->render(dc);
 
-		//敵描画処理
-		EnemyManager::instance()->render(dc);
+			//敵描画処理
+			EnemyManager::instance()->render(dc);
+
+		}
+
+		
+		post_effect->OffScrrenEnd(dc);
+		post_effect->Render(dc);
 	}
 
 	//3Dエフェクト描画

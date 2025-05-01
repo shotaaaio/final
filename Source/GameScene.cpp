@@ -12,6 +12,7 @@
 
 #include "Graphics/Texture.h"
 #include "Mathf.h"
+#include "Framework.h"
 
 // 初期化
 void GameScene::initialize()
@@ -20,7 +21,7 @@ void GameScene::initialize()
 
 	// シーン定数バッファの作成
 	createBuffer<GameScene::SceneConstants>(DeviceManager::instance()->getDevice(), buffer.GetAddressOf());
-
+	
 	//ステージの作成
 	stage = std::make_unique<Stage>();
 	StageManager::instance()->regist(stage.get());
@@ -76,6 +77,8 @@ void GameScene::initialize()
 		//	パーティクルシステム生成
 		particle_bomb = std::make_unique<ParticleSystem>(deviceMgr->getDevice(), shader_resource_view, 5, 5);
 	}
+
+	post_effect = std::make_unique<PostEffect>(deviceMgr->getDevice());
 }
 
 // 終了処理
@@ -84,6 +87,8 @@ void GameScene::finalize()
 	//エネミー終了化
 	EnemyManager::instance()->clear();
 	EffectManager::instance()->finalize();
+
+	//post_effect->Uninitialize();
 }
 
 // 更新処理
@@ -140,6 +145,8 @@ void GameScene::update(float elapsedTime)
 	//エフェクトの更新
 	EffectManager::instance()->update(elapsedTime);
 
+	
+	post_effect->Update();
 
 	////	パーティクルシステム更新
 	//if (particle_bomb)
@@ -202,47 +209,61 @@ void GameScene::render()
 	// 3D 描画に利用する定数バッファの更新と設定
 	bindBuffer(dc, 1, buffer.GetAddressOf(), &sc);
 
-	//スカイマップ
-	graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc) {
-		// サンプラーステートの設定（アニソトロピック）
-		dc->PSSetSamplers(0, 1, rc->samplerStates[static_cast<uint32_t>(SAMPLER_STATE::ANISOTROPIC)].GetAddressOf());
-		// ブレンドステートの設定（アルファ）
-		dc->OMSetBlendState(rc->blendStates[static_cast<uint32_t>(BLEND_STATE::ALPHABLENDING)].Get(), nullptr, 0xFFFFFFFF);
-		// 深度ステンシルステートの設定（深度テストオン、深度書き込みオフ）
-		dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::ON_OFF)].Get(), 0);
-		// ラスタライザステートの設定（ソリッド、裏面表示オフ）
-		dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
-		});
+	
+	post_effect->UpdateBuffer(dc);
+
+	//オフスクリーンレンダリング指定区間
 	{
-		DirectX::XMFLOAT4X4 inverse_view_projection;
-		//カメラの逆行列
-		DirectX::XMStoreFloat4x4(&inverse_view_projection, DirectX::XMMatrixInverse(nullptr, View * Projection));
-		skymap->Render(dc,camera->getEye(),inverse_view_projection);
+		post_effect->OffScreenStart(dc);
+		//スカイマップ
+		graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc) {
+			// サンプラーステートの設定（アニソトロピック）
+			dc->PSSetSamplers(0, 1, rc->samplerStates[static_cast<uint32_t>(SAMPLER_STATE::ANISOTROPIC)].GetAddressOf());
+			// ブレンドステートの設定（アルファ）
+			dc->OMSetBlendState(rc->blendStates[static_cast<uint32_t>(BLEND_STATE::ALPHABLENDING)].Get(), nullptr, 0xFFFFFFFF);
+			// 深度ステンシルステートの設定（深度テストオン、深度書き込みオフ）
+			dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::ON_OFF)].Get(), 0);
+			// ラスタライザステートの設定（ソリッド、裏面表示オフ）
+			dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
+			});
+		{
+			DirectX::XMFLOAT4X4 inverse_view_projection;
+			//カメラの逆行列
+			DirectX::XMStoreFloat4x4(&inverse_view_projection, DirectX::XMMatrixInverse(nullptr, View * Projection));
+			skymap->Render(dc, camera->getEye(), inverse_view_projection);
+		}
+
+		// 3D 描画設定
+		graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc) {
+			// サンプラーステートの設定（アニソトロピック）
+			dc->PSSetSamplers(0, 1, rc->samplerStates[static_cast<uint32_t>(SAMPLER_STATE::ANISOTROPIC)].GetAddressOf());
+			// ブレンドステートの設定（アルファ）
+			dc->OMSetBlendState(rc->blendStates[static_cast<uint32_t>(BLEND_STATE::ALPHABLENDING)].Get(), nullptr, 0xFFFFFFFF);
+			// 深度ステンシルステートの設定（深度テストオン、深度書き込みオン）
+			dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::ON_ON)].Get(), 0);
+			// ラスタライザステートの設定（ソリッド、裏面表示オフ）
+			dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
+			});
+
+		// 3D 描画
+		{
+			//ステージの描画
+			stage->render(dc);
+
+			//プレイヤーの描画
+			player->render(dc);
+
+			//敵描画処理
+			EnemyManager::instance()->render(dc);
+		}
+
+		
+		post_effect->OffScrrenEnd(dc);
+		post_effect->Render(dc);
 	}
 
-	// 3D 描画設定
-	graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc){
-		// サンプラーステートの設定（アニソトロピック）
-		dc->PSSetSamplers(0, 1, rc->samplerStates[static_cast<uint32_t>(SAMPLER_STATE::ANISOTROPIC)].GetAddressOf());
-		// ブレンドステートの設定（アルファ）
-		dc->OMSetBlendState(rc->blendStates[static_cast<uint32_t>(BLEND_STATE::ALPHABLENDING)].Get(), nullptr, 0xFFFFFFFF);
-		// 深度ステンシルステートの設定（深度テストオン、深度書き込みオン）
-		dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::ON_ON)].Get(), 0);
-		// ラスタライザステートの設定（ソリッド、裏面表示オフ）
-		dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
-	});
-
-	// 3D 描画
-	{
-		//ステージの描画
-		stage->render(dc);
-
-		//プレイヤーの描画
-		player->render(dc);
-
-		//敵描画処理
-		EnemyManager::instance()->render(dc);
-	}
+	//深度ステンシル書き換え
+	dc->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 	//3Dエフェクト描画
 	{
@@ -305,6 +326,8 @@ void GameScene::render()
 		ImGui::InputFloat3("camera position", &eye.x);
 		ImGui::SliderFloat("damp", &damp, 2.0f, 5.0f);
 		ImGui::End();
+
+		post_effect->UpdateImGui();
 	}
 }
 
@@ -457,3 +480,4 @@ void GameScene::enemyPlacementByTouch(ID3D11DeviceContext* dc)
 
 	}
 }
+

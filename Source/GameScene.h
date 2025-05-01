@@ -11,6 +11,10 @@
 #include "Graphics/Skymap.h"
 #include "particle/particle_system.h"
 
+#include "misc.h"
+
+#include "Graphics/PostEffect.h"
+
 // ゲームシーン
 class GameScene :public Scene
 {
@@ -39,7 +43,7 @@ private:
 
 	//タッチによる敵の出現
 	void enemyPlacementByTouch(ID3D11DeviceContext* dc);
-private:
+public:
 	// シーン定数
 	struct SceneConstants
 	{
@@ -62,4 +66,8 @@ private:
 	DirectX::XMFLOAT3 options = { 0.5f,0.3f,5.0f };
 	DirectX::XMFLOAT3 idealPos;
 	float damp = 2.0f;
+
+	std::unique_ptr<PostEffect> post_effect;
+
+	
 };

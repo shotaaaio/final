@@ -62,6 +62,4 @@ private:
 	DirectX::XMFLOAT3 options = { 0.5f,0.3f,5.0f };
 	DirectX::XMFLOAT3 idealPos;
 	float damp = 2.0f;
-
-	std::unique_ptr<PostEffect> post_effect;
 };

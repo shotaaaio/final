@@ -38,4 +38,5 @@ inline void bindBuffer(ID3D11DeviceContext* dc, int slot, ID3D11Buffer** buffer,
 	dc->UpdateSubresource(*buffer, 0, 0, constants, 0, 0);
 	dc->VSSetConstantBuffers(slot, 1, buffer);
 	dc->PSSetConstantBuffers(slot, 1, buffer);
+	dc->GSSetConstantBuffers(slot, 1, buffer);
 }

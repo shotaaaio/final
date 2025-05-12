@@ -580,6 +580,6 @@ void GameScene::Pause()
 {
 	if (pauseFlag)
 	{
-		pause_sprite->setShaderResourceView(frameBuffers[0]->shader_resource_views[0], 1280.0f, 720.0f);
+		pause_sprite->setShaderResourceView(frameBuffers[0]->shader_resource_views[0], 1280.0, 720.0);
 	}
 }

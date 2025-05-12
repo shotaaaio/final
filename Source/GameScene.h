@@ -123,8 +123,12 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Buffer> colorfilterbuffer;
 	DirectX::XMFLOAT4 colorfilterparameter{ 0.0f, 1.0f, 1.0f, 0.0f };
 
+	//‰¼
+	bool pauseFlag = false;
+	std::unique_ptr<Sprite> pause_sprite;
 private:
 	void CreateShader(ID3D11Device* device);
 	void UsePostEffect(ID3D11DeviceContext* dc, int index);
 	void ComputeVignette();
+	void Pause();
 };

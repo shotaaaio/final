@@ -221,3 +221,10 @@ void Sprite::render(ID3D11DeviceContext* immediate_context, float dx, float dy, 
 		0.0f,
 		0.0f, 0.0f, static_cast<float>(texture2d_desc.Width), static_cast<float>(texture2d_desc.Height));
 }
+
+void Sprite::setShaderResourceView(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int texWidth, int texHeight)
+{
+	shader_resource_view = srv;
+	texture2d_desc.Width = texWidth;
+	texture2d_desc.Height = texHeight;
+}

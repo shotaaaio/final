@@ -46,6 +46,7 @@ public:
 	float getTextureWidth() { return static_cast<float>(texture2d_desc.Width); }
 	float getTextureHeight() { return static_cast<float>(texture2d_desc.Height); }
 
+	void setShaderResourceView(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int texWidth, int texHeight);
 private:
 	static void rotate(float& x, float& y, float cx, float cy, float angle)
 	{

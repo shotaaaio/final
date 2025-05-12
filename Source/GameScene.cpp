@@ -101,6 +101,7 @@ void GameScene::finalize()
 // 更新処理
 void GameScene::update(float elapsedTime)
 {
+	if (pauseFlag)return;
 	//カメラ操作の更新
 	DirectX::XMFLOAT3 target = *(player->getPosition());
 	target.y += options.x; //プレイヤーの腰あたりに注視点設定
@@ -296,7 +297,7 @@ void GameScene::render()
 		dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
 		});
 	{
-		if (particle_bomb)particle_bomb->Render(dc, *view, *proj);
+		//if (particle_bomb)particle_bomb->Render(dc, *view, *proj);
 	}
 
 	// 3Dデバッグ描画
@@ -374,6 +375,14 @@ void GameScene::render()
 			ImGui::TreePop();
 		}
 		ImGui::Separator();
+
+		if (ImGui::TreeNode("Pause Texture"))
+		{
+			ImGui::Checkbox("pause flag", &pauseFlag);
+			ImGui::Image(frameBuffers[0]->shader_resource_views[0].Get(), {256, 256}, {0, 0}, {1, 1}, {1, 1, 1, 1});
+			ImGui::TreePop();
+		}
+
 		ImGui::End();
 	}
 }
@@ -565,4 +574,12 @@ void GameScene::ComputeVignette()
 	vignette.vignette_smoothness = max(0.000001f, vignettedata.vignette_smoothness);
 	vignette.vignette_rounded = vignettedata.vignette_rounded ? 1.0f : 0.0f;
 	vignette.vignette_roundness = 6.0f * (1.0f - vignettedata.vignette_roundness);
+}
+
+void GameScene::Pause()
+{
+	if (pauseFlag)
+	{
+		pause_sprite->setShaderResourceView(frameBuffers[0]->shader_resource_views[0], 1280.0f, 720.0f);
+	}
 }

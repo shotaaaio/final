@@ -76,14 +76,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\Utils\Effeksser170e\include.\Effekseer;.\Utils\Effeksser170e\include.\EffekseerRendererDX11;.\Utils\Effeksser170e\include.\LLGI;.\Utils.\imgui;.\Utils.\DirectXTK-main\Inc;.\Utils.\cereal-master\include;.\Source;.\Utils\FBX SDK\2020.3.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Utils\DirectXTK-main\Inc;.\Utils\FBX SDK\2020.3.1\include;.\Utils\cereal-master\include;.\Utils\DirectXTex-main\DirectXTex;.\Source;.\Utils\Effeksser170e\include.\Effekseer;.\Utils\Effeksser170e\include.\EffekseerRendererDX11;.\Utils\Effeksser170e\include\LLGI</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Utils\FBX SDK\2020.3.1\lib\vs2019\x64\debug;.\Utils\DirectXTK-main\Bin\Desktop_2022\x64\Debug;.\Utils\Effeksser170e\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d11.lib;DirectXTK.lib;xinput.lib;xaudio2.lib;winmm.lib;Effekseerd.lib;EffekseerRendererDX11d.lib;LLGId.lib;zlib-mt.lib;libxml2-mt.lib;libfbxsdk-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Utils\FBX SDK\2020.3.1\lib\vs2019\x64\debug;.\Utils\DirectXTK-main\Bin\Desktop_2022\x64\Debug;.\Utils\Effeksser170e\lib;.\Utils\DirectXTex-main\DirectXTex\Bin\Desktop_2022\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;xinput.lib;xaudio2.lib;winmm.lib;Effekseerd.lib;EffekseerRendererDX11d.lib;LLGId.lib;zlib-mt.lib;libxml2-mt.lib;libfbxsdk-mt.lib;DirectXTK.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -94,7 +94,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\Utils\FBX SDK\2020.3.1\include;.\Source;.\Utils\cereal-master;.\Utils\DirectXTK-main;.\Utils\Effeksser170e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Utils\DirectXTK-main\Inc</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -109,15 +109,15 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\Utils\Effeksser170e\include.\Effekseer;.\Utils\Effeksser170e\include.\EffekseerRendererDX11;.\Utils\Effeksser170e\include.\LLGI;.\Utils.\imgui;.\Utils.\DirectXTK-main\Inc;.\Utils.\cereal-master\include;.\Source;.\Utils\FBX SDK\2020.3.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Utils\DirectXTK-main\Inc;.\Utils\FBX SDK\2020.3.1\include;.\Utils\cereal-master\include;.\Utils\DirectXTex-main\DirectXTex;.\Source;.\Utils\Effeksser170e\include.\Effekseer;.\Utils\Effeksser170e\include.\EffekseerRendererDX11;.\Utils\Effeksser170e\include\LLGI</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\Utils\FBX SDK\2020.3.1\lib\vs2019\x64\debug;.\Utils\DirectXTK-main\Bin\Desktop_2022\x64\Debug;.\Utils\Effeksser170e\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>d3d11.lib;DirectXTK.lib;xinput.lib;xaudio2.lib;winmm.lib;Effekseerd.lib;EffekseerRendererDX11d.lib;LLGId.lib;zlib-mt.lib;libxml2-mt.lib;libfbxsdk-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>.\Utils\FBX SDK\2020.3.1\lib\vs2019\x64\debug;.\Utils\DirectXTK-main\Bin\Desktop_2022\x64\Debug;.\Utils\Effeksser170e\lib;.\Utils\DirectXTex-main\DirectXTex\Bin\Desktop_2022\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d11.lib;xinput.lib;xaudio2.lib;winmm.lib;Effekseerd.lib;EffekseerRendererDX11d.lib;LLGId.lib;zlib-mt.lib;libxml2-mt.lib;libfbxsdk-mt.lib;DirectXTK.lib;DirectXTex.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <FxCompile>
       <ObjectFileOutput>Shader\%(Filename).cso</ObjectFileOutput>
@@ -138,7 +138,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\Utils\FBX SDK\2020.3.1\include;.\Source;.\Utils\cereal-master;.\Utils\DirectXTK-main;.\Utils\Effeksser170e\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\Utils\DirectXTK-main\Inc</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>

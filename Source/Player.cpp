@@ -15,7 +15,8 @@
 Player::Player()
 {
 	//model = std::make_unique<SkinnedMesh>(DeviceManager::instance()->getDevice(), "Resources\\Model\\Jummo\\Jummo.fbx");
-	model = std::make_unique<SkinnedMesh>(DeviceManager::instance()->getDevice(), "Resources\\Model\\nico\\nico.fbx");
+	//model = std::make_unique<SkinnedMesh>(DeviceManager::instance()->getDevice(), "Resources\\Model\\nico\\nico.fbx");
+	model = std::make_unique<SkinnedMesh>(DeviceManager::instance()->getDevice(), "Resources\\Model\\UnityChan\\UnityChan.fbx");
 
 	//model->append_animations("Resources\\Model\\Jummo\\Animations\\Attack.fbx",0);
 	const float scale_factor = 0.01f; //モデルが大きいのでスケーリング
@@ -25,8 +26,8 @@ Player::Player()
 	onLandingEffect = std::make_unique<Effect>("Resources\\Effect\\01_AndrewFM01\\blue_laser.efk");
 
 	playAnimation(0,true);
-	meshIndex = model->findMeshIndex("NIC:magic_wand");
-	boneIndex = model->findBoneIndex("NIC:wand2_BK",meshIndex);
+	/*meshIndex = model->findMeshIndex("NIC:magic_wand");
+	boneIndex = model->findBoneIndex("NIC:wand2_BK",meshIndex);*/
 
 	//それぞれのボタン入力の行動を設定
 	Key_c = std::bind(&Player::FlyingStraightBullet,this);
@@ -43,10 +44,10 @@ Player::~Player()
 //更新処理
 void Player::update(float elapsedTime)
 {
-	if (!isPlayAnimation())
+	/*if (!isPlayAnimation())
 	{
 		playAnimation(0, true);
-	}
+	}*/
 
 	//移動受付
 	InputMove(elapsedTime);
@@ -67,12 +68,12 @@ void Player::update(float elapsedTime)
 	collisionBulletAndEnemies();
 
 	//アニメーションの更新
-	updateAnimation(elapsedTime);
+	//updateAnimation(elapsedTime);
 
 	//ワールド行列の更新
 	updateTransform();
 
-	bonePosition = model->getBonePosition(meshIndex, boneIndex, keyframe, transform);
+	//bonePosition = model->getBonePosition(meshIndex, boneIndex, keyframe, transform);
 }
 
 //描画処理
@@ -103,7 +104,7 @@ void Player::drawDebugGui()
 	//速度
 	ImGui::InputFloat3("Velocity", &velocity.x);
 
-	ImGui::InputFloat3("lod pos", &bonePosition.x);
+	//ImGui::InputFloat3("lod pos", &bonePosition.x);
 
 	ImGui::End();
 }
@@ -119,11 +120,11 @@ void Player::drawDrawPrimitive()
 	//弾デバックプリミティブ描画
 	bulletMgr.drawDebugPrimitive();
 
-	debugRenderer->drawSphere(
+	/*debugRenderer->drawSphere(
 		bonePosition,
 		1.0f,
 		DirectX::XMFLOAT4(1, 0, 0, 1)
-	);
+	);*/
 
 }
 
@@ -307,7 +308,7 @@ void Player::JumpAction()
 
 void Player::Attack()
 {
-	playAnimation(7, false);
+	//playAnimation(7, false);
 }
 
 

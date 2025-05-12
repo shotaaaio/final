@@ -1,0 +1,6 @@
+model:Resources\Model\Cube\Cube.fbx
+position:0,0,0
+angle:0,0,0
+scale:-21,1,19
+texture:Textures\InteractableDefault_18906_Diffuse.png
+

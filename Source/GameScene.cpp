@@ -94,6 +94,7 @@ void GameScene::finalize()
 // 更新処理
 void GameScene::update(float elapsedTime)
 {
+	//if (pauseFlag)return;
 	//カメラ操作の更新
 	DirectX::XMFLOAT3 target = *(player->getPosition());
 	target.y += options.x; //プレイヤーの腰あたりに注視点設定
@@ -283,7 +284,7 @@ void GameScene::render()
 		dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
 		});
 	{
-		if (particle_bomb)particle_bomb->Render(dc, *view, *proj);
+		//if (particle_bomb)particle_bomb->Render(dc, *view, *proj);
 	}
 
 	// 3Dデバッグ描画

@@ -57,7 +57,7 @@ dcl_temps 3
 //   v1.x <- pin.texcoord.x; v1.y <- pin.texcoord.y; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 22 "C:\Users\2230218\source\repos\shotaaaio\final\HLSL\VignettePS.hlsl"
+#line 22 "C:\Users\2230160\Desktop\final\HLSL\VignettePS.hlsl"
 resinfo_indexable(texture2d)(float,float,float,float) r0.xy, l(0), t0.xyzw
 mov r0.x, r0.x  // r0.x <- scene_map_size.x
 mov r0.y, r0.y  // r0.y <- scene_map_size.y

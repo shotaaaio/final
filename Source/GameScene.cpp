@@ -94,7 +94,7 @@ void GameScene::finalize()
 // 更新処理
 void GameScene::update(float elapsedTime)
 {
-	if (pauseFlag)return;
+	//if (pauseFlag)return;
 	//カメラ操作の更新
 	DirectX::XMFLOAT3 target = *(player->getPosition());
 	target.y += options.x; //プレイヤーの腰あたりに注視点設定

@@ -2,12 +2,16 @@
 #include "misc.h"
 
 #include <WICTextureLoader.h>
+#include<string.h>
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
 #include <memory>
 #include <filesystem>
 #include <DDSTextureLoader.h>
+#include"DeviceManager.h"
+#include"DirectXTex.h"
+
 using namespace std;
 
 TextureManager::~TextureManager()
@@ -37,16 +41,28 @@ HRESULT TextureManager::loadTextureFromFile(
 	}
 	else
 	{
-		std::filesystem::path dds_filename(filename);
-		dds_filename.replace_extension("dds");
-		if (std::filesystem::exists(dds_filename.c_str()))
+		filesystem::path filename_p(filename);
+		wstring ext = filename_p.extension().wstring();
+		if (ext == L".dds")
 		{
-			hr = CreateDDSTextureFromFile(device, dds_filename.c_str(), resource.GetAddressOf(), shader_resource_view);
+			hr = CreateDDSTextureFromFile(device, filename_p.c_str(), resource.GetAddressOf(), shader_resource_view);
 			_ASSERT_EXPR(SUCCEEDED(hr), hrTrace(hr));
+		}
+		else if (ext == L".tga")
+		{
+			DirectX::ScratchImage image;
+			DirectX::TexMetadata metadata;
+			hr = DirectX::LoadFromTGAFile(filename_p.c_str(), &metadata, image);
+			_ASSERT_EXPR(SUCCEEDED(hr), hrTrace(hr));
+
+			hr = DirectX::CreateShaderResourceView(device, image.GetImages(), image.GetImageCount(), metadata, shader_resource_view);
+			_ASSERT_EXPR(SUCCEEDED(hr), hrTrace(hr));
+
+			(*shader_resource_view)->GetResource(resource.GetAddressOf());
 		}
 		else
 		{
-			hr = CreateWICTextureFromFile(device, filename, resource.GetAddressOf(), shader_resource_view);
+			hr = CreateWICTextureFromFile(device, filename_p.c_str(), resource.GetAddressOf(), shader_resource_view);
 			_ASSERT_EXPR(SUCCEEDED(hr), hrTrace(hr));
 		}
 		resources.insert({ filename, *shader_resource_view });
@@ -113,4 +129,28 @@ HRESULT TextureManager::makeDummyTexture(ID3D11Device* device, ID3D11ShaderResou
 void TextureManager::releaseAllTextures()
 {
 	resources.clear();
+}
+
+void TextureManager::createShaderResourceView(ID3D11ShaderResourceView *srv)
+{
+	ID3D11Device* device = DeviceManager::instance()->getDevice();
+	HRESULT hr{ S_OK };
+
+	Microsoft::WRL::ComPtr<ID3D11Texture2D> buffer{};
+	D3D11_TEXTURE2D_DESC texture2d_desc{};
+	texture2d_desc.Width = 1280;
+	texture2d_desc.Height = 720;
+	texture2d_desc.MipLevels = 1;
+	texture2d_desc.ArraySize = 1;
+	texture2d_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	texture2d_desc.SampleDesc.Count = 1;
+	texture2d_desc.SampleDesc.Quality = 0;
+	texture2d_desc.Usage = D3D11_USAGE_DEFAULT;
+	texture2d_desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	texture2d_desc.CPUAccessFlags = 0;
+	texture2d_desc.MiscFlags = 0;
+	hr = device->CreateTexture2D(&texture2d_desc, NULL, buffer.GetAddressOf());
+	_ASSERT_EXPR(SUCCEEDED(hr), hrTrace(hr));
+
+	hr = device->CreateShaderResourceView(buffer.Get(), NULL, &srv);
 }

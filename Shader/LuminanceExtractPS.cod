@@ -55,7 +55,7 @@ dcl_temps 2
 //   v1.x <- pin.texcoord.x; v1.y <- pin.texcoord.y; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 8 "C:\Users\2230218\source\repos\shotaaaio\final\HLSL\LuminanceExtractPS.hlsl"
+#line 8 "C:\Users\2230160\Desktop\final\HLSL\LuminanceExtractPS.hlsl"
 mov r0.xyz, l(0.299000,0.587000,0.114000,0)
 
 #line 14

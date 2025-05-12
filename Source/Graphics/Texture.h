@@ -36,6 +36,8 @@ public:
 	// 作成した全てのテクスチャを開放
 	void releaseAllTextures();
 
+	//シェーダーリソースビューの生成
+	void createShaderResourceView(ID3D11ShaderResourceView* srv);
 private:
 	std::map<std::wstring, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> resources;
 };

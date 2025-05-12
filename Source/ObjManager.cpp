@@ -4,7 +4,7 @@
 // çXêVèàóù
 void ObjManager::update(float elapsedTime)
 {
-    for (Obj* enemy : enemies)
+    for (Obj* enemy : objs)
     {
         enemy->update(elapsedTime);
     }
@@ -12,12 +12,12 @@ void ObjManager::update(float elapsedTime)
     // îjä¸èàóù
     for (Obj* bullet : removes)
     {
-        auto itr = std::find(enemies.begin(), enemies.end(), bullet);
-        if (itr != enemies.end())
+        auto itr = std::find(objs.begin(), objs.end(), bullet);
+        if (itr != objs.end())
         {
             // îjä¸Ç∑Ç◊Ç´ bullet Ç™ bullets ì‡Ç…ë∂ç›Ç∑ÇÈèÍçáÅAçÌèú
             delete bullet;
-            enemies.erase(itr);
+            objs.erase(itr);
         }
     }
     // îjä¸ÉäÉXÉgÇÉNÉäÉA
@@ -28,26 +28,26 @@ void ObjManager::update(float elapsedTime)
 // ï`âÊèàóù
 void ObjManager::render(ID3D11DeviceContext* dc)
 {
-    for (Obj* enemy : enemies)
+    for (Obj* obj : objs)
     {
-        enemy->render(dc);
+        obj->render(dc);
     }
 }
 
 // ìGÇìoò^
-void ObjManager::regist(Obj* enemy)
+void ObjManager::regist(Obj* obj)
 {
-    enemies.emplace_back(enemy);
+    objs.emplace_back(obj);
 }
 
 // ìGÇÃëSçÌèú
 void ObjManager::clear()
 {
-    for (Obj* enemy : enemies)
+    for (Obj* obj : objs)
     {
-        delete enemy;
+        delete obj;
     }
-    enemies.clear();
+    objs.clear();
 }
 
 //void ObjManager::drawDebugPrimitive()
@@ -60,33 +60,33 @@ void ObjManager::clear()
 
 void ObjManager::collisionEnemiesAndEnemies()
 {
-    int enemyCount = getObjCount();
-    for (int i = 0; i < enemyCount; i++)
+    int objCount = getObjCount();
+    for (int i = 0; i < objCount; i++)
     {
-        Obj* EnemyA = enemies.at(i);
-        for (int j = i + 1; j < enemyCount; j++)
+        Obj* objA = objs.at(i);
+        for (int j = i + 1; j < objCount; j++)
         {
-            Obj* EnemyB = enemies.at(j);
+            Obj* objB = objs.at(j);
 
             DirectX::XMFLOAT3 outVec;
 
             if (Collision::intersectCylinderAndCylinder(
-                *EnemyA->getPosition(),
-                EnemyA->getRadius(),
-                EnemyA->getHeight(),
-                *EnemyB->getPosition(),
-                EnemyB->getRadius(),
-                EnemyB->getHeight(),
+                *objA->getPosition(),
+                objA->getRadius(),
+                objA->getHeight(),
+                *objB->getPosition(),
+                objB->getRadius(),
+                objB->getHeight(),
                 outVec))
             {
                 // è’ìÀÇµÇƒÇ¢ÇÈèÍçáÅAEnemyBÇÃà íuÇèCê≥
-                float radius = EnemyA->getRadius() + EnemyB->getRadius();
+                float radius = objA->getRadius() + objB->getRadius();
                 DirectX::XMVECTOR vec = DirectX::XMVectorScale(DirectX::XMLoadFloat3(&outVec), radius);
-                vec = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(EnemyA->getPosition()), vec);
+                vec = DirectX::XMVectorAdd(DirectX::XMLoadFloat3(objA->getPosition()), vec);
                 DirectX::XMFLOAT3 pos;
                 DirectX::XMStoreFloat3(&pos, vec);
-                pos.y = EnemyB->getPosition()->y;
-                EnemyB->setPosition(pos);
+                pos.y = objB->getPosition()->y;
+                objB->setPosition(pos);
             }
         }
     }
@@ -104,40 +104,40 @@ void ObjManager::remove(Obj* enemy)
     removes.push_back(enemy);
 }
 
-Obj* ObjManager::getEnemyByRay(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd)
+Obj* ObjManager::getObjByRay(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd)
 {
     DirectX::XMVECTOR startVec = DirectX::XMLoadFloat3(&rayStart);
     DirectX::XMVECTOR endVec = DirectX::XMLoadFloat3(&rayEnd);
     DirectX::XMVECTOR rayDir = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(endVec, startVec));
 
     float closestDist = FLT_MAX;
-    Obj* closestEnemy = nullptr;
+    Obj* closestobj = nullptr;
 
     for (int i = 0; i < getObjCount(); ++i)
     {
-        Obj* enemy = getObj(i);
-        DirectX::XMFLOAT3 enemyPos = *enemy->getPosition();
-        DirectX::XMVECTOR enemyVec = DirectX::XMLoadFloat3(&enemyPos);
+        Obj* obj = getObj(i);
+        DirectX::XMFLOAT3 objPos = *obj->getPosition();
+        DirectX::XMVECTOR objVec = DirectX::XMLoadFloat3(&objPos);
 
-        DirectX::XMVECTOR toEnemyVec = DirectX::XMVectorSubtract(enemyVec, startVec);
+        DirectX::XMVECTOR toobjVec = DirectX::XMVectorSubtract(objVec, startVec);
         float t;
-        DirectX::XMStoreFloat(&t, DirectX::XMVector3Dot(toEnemyVec, rayDir));
+        DirectX::XMStoreFloat(&t, DirectX::XMVector3Dot(toobjVec, rayDir));
 
         if (t < 0)
             continue;
 
         DirectX::XMVECTOR closestPoint = DirectX::XMVectorAdd(startVec, DirectX::XMVectorScale(rayDir, t));
-        DirectX::XMVECTOR diffVec = DirectX::XMVectorSubtract(enemyVec, closestPoint);
+        DirectX::XMVECTOR diffVec = DirectX::XMVectorSubtract(objVec, closestPoint);
 
         float distSq;
         DirectX::XMStoreFloat(&distSq, DirectX::XMVector3LengthSq(diffVec));
 
-        float radius = enemy->getRadius();
+        float radius = obj->getRadius();
         if (distSq <= radius * radius && t < closestDist)
         {
             closestDist = t;
-            closestEnemy = enemy;
+            closestobj = obj;
         }
     }
-    return closestEnemy;
+    return closestobj;
 }

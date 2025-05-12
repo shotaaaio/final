@@ -37,10 +37,10 @@ public:
     //void drawDebugPrimitive();
 
     // “G‚Ì‘”‚ğæ“¾
-    int getObjCount() const { return static_cast<int>(enemies.size()); }
+    int getObjCount() const { return static_cast<int>(objs.size()); }
 
     // “G‚ğæ“¾
-    Obj* getObj(int index) { return enemies.at(index); }
+    Obj* getObj(int index) { return objs.at(index); }
 
     Obj* searchEnemy(DirectX::XMFLOAT3* position)
     {
@@ -70,9 +70,9 @@ public:
     // “Gíœ
     void remove(Obj* enemy);
 
-    Obj* getEnemyByRay(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd);
+    Obj* getObjByRay(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd);
 
 private:
-    std::vector<Obj*>	enemies;
+    std::vector<Obj*>	objs;
     std::vector<Obj*> removes;
 };

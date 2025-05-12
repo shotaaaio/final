@@ -3,9 +3,10 @@
 #include"Graphics/GraphicsManager.h"
 #include"Input/InputManager.h"
 #include"SceneManager.h"
-#include"GameScene.h"
-#include"GameScene2.h"
-#include"GameScene3.h"
+#include"StageEast.h"
+#include"StageTuta.h"
+#include"StageVisible.h"
+#include"StageReplacement.h"
 #include"LoadingScene.h"
 #include "imgui.h"
 
@@ -78,15 +79,19 @@ void TitleScene::render()
 	{
 		if (ImGui::Button(u8"Stage:1"))
 		{
-			SceneManager::instance()->changeScene(new LoadingScene(new GameScene));
+			SceneManager::instance()->changeScene(new LoadingScene(new StageEast));
 		}
 		if (ImGui::Button(u8"Stage:2"))
 		{
-			SceneManager::instance()->changeScene(new LoadingScene(new GameScene2));
+			SceneManager::instance()->changeScene(new LoadingScene(new StageTuta));
 		}
 		if (ImGui::Button(u8"Stage:3"))
 		{
-			SceneManager::instance()->changeScene(new LoadingScene(new GameScene3));
+			SceneManager::instance()->changeScene(new LoadingScene(new StageVisible));
+		}
+		if (ImGui::Button(u8"Stage:4"))
+		{
+			SceneManager::instance()->changeScene(new LoadingScene(new StageReplacement));
 		}
 	}
 	ImGui::End();

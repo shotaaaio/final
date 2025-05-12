@@ -179,9 +179,10 @@
     <ClCompile Include="Source\EnemyPlantune.cpp" />
     <ClCompile Include="Source\EnemySlime.cpp" />
     <ClCompile Include="Source\Framework.cpp" />
-    <ClCompile Include="Source\GameScene.cpp" />
-    <ClCompile Include="Source\GameScene2.cpp" />
-    <ClCompile Include="Source\GameScene3.cpp" />
+    <ClCompile Include="Source\StageEast.cpp" />
+    <ClCompile Include="Source\StageReplacement.cpp" />
+    <ClCompile Include="Source\StageTuta.cpp" />
+    <ClCompile Include="Source\StageVisible.cpp" />
     <ClCompile Include="Source\Goal.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\GraphicsManager.cpp" />
@@ -234,9 +235,10 @@
     <ClInclude Include="Source\EnemyPlantune.h" />
     <ClInclude Include="Source\EnemySlime.h" />
     <ClInclude Include="Source\Framework.h" />
-    <ClInclude Include="Source\GameScene.h" />
-    <ClInclude Include="Source\GameScene2.h" />
-    <ClInclude Include="Source\GameScene3.h" />
+    <ClInclude Include="Source\StageEast.h" />
+    <ClInclude Include="Source\StageReplacement.h" />
+    <ClInclude Include="Source\StageTuta.h" />
+    <ClInclude Include="Source\StageVisible.h" />
     <ClInclude Include="Source\Goal.h" />
     <ClInclude Include="Source\Graphics\Buffer.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer.h" />
@@ -264,6 +266,7 @@
     <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\SceneManager.h" />
+    <ClInclude Include="Source\ScoreManager.h" />
     <ClInclude Include="Source\Stage.h" />
     <ClInclude Include="Source\StageManager.h" />
     <ClInclude Include="Source\StraightBullet.h" />

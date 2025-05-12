@@ -28,6 +28,8 @@ public:
 	//速度取得
 	DirectX::XMFLOAT3 getVelocity() { return velocity; }
 
+	void setVelocity(const DirectX::XMFLOAT3& v) { this->velocity = v; }
+
 	/// <summary>
 	/// ダメージ処理
 	/// </summary>
@@ -146,4 +148,6 @@ protected:
 
 	//アニメーションブレンドの時間
 	float animationBlendSeconds = 0.0f;
+public:
+	virtual void onRayCastHit(DirectX::XMFLOAT3 s, DirectX::XMFLOAT3 e);
 };

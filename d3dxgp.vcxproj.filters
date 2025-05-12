@@ -30,7 +30,7 @@
     <ClCompile Include="Source\Framework.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameScene.cpp">
+    <ClCompile Include="Source\StageEast.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\main.cpp">
@@ -162,7 +162,7 @@
     <ClCompile Include="Source\particle\particle_system.cpp">
       <Filter>Source\Particle</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameScene2.cpp">
+    <ClCompile Include="Source\StageTuta.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Source\ObjManager.cpp">
@@ -183,7 +183,10 @@
     <ClCompile Include="Source\Goal.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Source\GameScene3.cpp">
+    <ClCompile Include="Source\StageVisible.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\StageReplacement.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -191,7 +194,7 @@
     <ClInclude Include="Source\Framework.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameScene.h">
+    <ClInclude Include="Source\StageEast.h">
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Source\high_resolution_timer.h">
@@ -335,7 +338,7 @@
     <ClInclude Include="Source\Mathf.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameScene2.h">
+    <ClInclude Include="Source\StageTuta.h">
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Source\ObjManager.h">
@@ -359,7 +362,13 @@
     <ClInclude Include="Source\Goal.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\GameScene3.h">
+    <ClInclude Include="Source\StageVisible.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ScoreManager.h">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StageReplacement.h">
       <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>

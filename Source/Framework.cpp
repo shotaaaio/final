@@ -102,7 +102,7 @@ int Framework::run()
 			timer.tick();
 			calculateFrameStats();
 
-			float elapsedTime = syncInterval == 0 ? timer.timeInterval() : syncInterval / 60.0f;
+			float elapsedTime = timer.timeInterval();
 			
 			update(elapsedTime);
 			render(elapsedTime);

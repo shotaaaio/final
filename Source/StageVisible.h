@@ -11,12 +11,12 @@
 #include "Graphics/Skymap.h"
 #include "particle/particle_system.h"
 
-// ゲームシーン
-class GameScene :public Scene
+// 敵が画面内にいるか
+class StageVisible :public Scene
 {
 public:
-	GameScene() {}
-	~GameScene() {}
+	StageVisible() {}
+	~StageVisible() {}
 
 	// 初期化
 	void initialize()override;
@@ -39,6 +39,8 @@ private:
 
 	//タッチによる敵の出現
 	void enemyPlacementByTouch(ID3D11DeviceContext* dc);
+
+	bool isEnemyVisible();
 private:
 	// シーン定数
 	struct SceneConstants
@@ -62,4 +64,6 @@ private:
 	DirectX::XMFLOAT3 options = { 0.5f,0.3f,5.0f };
 	DirectX::XMFLOAT3 idealPos;
 	float damp = 2.0f;
+
+	float enemyVisibleTime = 0.0f;
 };

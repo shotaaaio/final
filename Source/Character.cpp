@@ -271,6 +271,7 @@ void Character::updateHorizontalMove(float elapsedTime)
 		HitResult hit;
 		if (StageManager::instance()->getStage(0)->raycast(start, end, hit))
 		{
+			onRayCastHit(start,end);
 			DirectX::XMVECTOR startVec = DirectX::XMLoadFloat3(&hit.position);
 			DirectX::XMVECTOR endVec = DirectX::XMLoadFloat3(&end);
 			DirectX::XMVECTOR vec = DirectX::XMVectorSubtract(endVec, startVec);
@@ -394,4 +395,8 @@ bool Character::isPlayAnimation() const
 	if (animation_index < 0)return false;
 	if (animation_index >= model->animation_clips.size())return false;
 	return true;
+}
+
+void Character::onRayCastHit(DirectX::XMFLOAT3 s, DirectX::XMFLOAT3 e) {
+	// Šî’êƒNƒ‰ƒX‚Å‚Í‰½‚à‚µ‚È‚­‚Ä‚àOK
 }

@@ -49,6 +49,8 @@ public:
     // ÕŒ‚‚ğ—^‚¦‚é
     void addImpulse(const DirectX::XMFLOAT3& impulse);
 
+    const DirectX::XMFLOAT4X4* getTransform() const { return &transform; }
+
 protected:
     // ‘¬“xˆ—XV
     void updateVelocity(float elpasedTime);

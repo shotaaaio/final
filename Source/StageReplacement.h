@@ -10,14 +10,13 @@
 #include "Graphics/Sprite.h"
 #include "Graphics/Skymap.h"
 #include "particle/particle_system.h"
-#include "Enemy.h"
 
-// ゲームシーン
-class GameScene2 :public Scene
+// お題入れ替え
+class StageReplacement :public Scene
 {
 public:
-	GameScene2() {}
-	~GameScene2() {}
+	StageReplacement() {}
+	~StageReplacement() {}
 
 	// 初期化
 	void initialize()override;
@@ -39,7 +38,9 @@ private:
 	);
 
 	//タッチによる敵の出現
-	void enemyPlacementByTouch(ID3D11DeviceContext* dc, float elapsedTime);
+	void enemyPlacementByTouch(ID3D11DeviceContext* dc);
+
+	//void IsEast();
 private:
 	// シーン定数
 	struct SceneConstants
@@ -64,8 +65,8 @@ private:
 	DirectX::XMFLOAT3 idealPos;
 	float damp = 2.0f;
 
-	bool clickGauge[20];
-	std::unordered_map<Enemy*, DirectX::XMFLOAT2> gaugeOffsets;
-
-	bool gauge_b = true;
+	std::unique_ptr<Sprite> Theme;
+	std::unique_ptr<Sprite> se;
+	std::unique_ptr<Sprite> i;
+	std::unique_ptr<Sprite> ka;
 };

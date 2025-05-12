@@ -39,9 +39,14 @@ public:
 	void Attack();
 	void FlyingStraightBullet();
 	void FlyingHomingBullet();
+	void Reset();
 
 	//入力受付
 	void inputAction();
+	void onRayCastHit(DirectX::XMFLOAT3 s, DirectX::XMFLOAT3 e) override;
+public:
+	bool IsStageEast = false;//StageEastかどうか
+	bool IsGoal = false;//true...ゴールした
 protected:
 	//着地したとき呼び出される
 	void onLanding()override;
@@ -53,6 +58,10 @@ private:
 	void Hashigo();
 
 	void inGoal();
+
+	void Timer(float elapsedTime);
+
+	void Chase(float elapsedTime);
 private:
 	//移動スピード
 	float moveSpeed = 5.0f;
@@ -89,10 +98,6 @@ private:
 
 	int attack_count = 0;
 
-	bool IsGoal = false;//true...ゴールした
-
-	bool move_b = true;//true...プレイヤーが動ける
-
 	float posY1 = 0.0f;//クリア演出用
 	float posY2 = 720.0f;//クリア演出用
 
@@ -113,6 +118,21 @@ private:
 	std::unique_ptr<Sprite> whiteImage;
 
 	std::unique_ptr<Sprite> clearText;
+
+	std::unique_ptr<Sprite> timerText;
+
+	std::unique_ptr<Sprite> rankText;
+
+	std::unique_ptr<Sprite> secondsText;
+
+	float rank;
+
+	int time1 = 0;
+	int time2 = 0;
+
+	float seconds = 0.0f; // 経過秒数（毎フレーム加算）
+
+	bool two = false;//timerが一桁の間はfalse
 };
 
 enum class NodeState

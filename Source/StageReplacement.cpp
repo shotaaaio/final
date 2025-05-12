@@ -1,9 +1,9 @@
-#include "GameScene2.h"
+#include "StageReplacement.h"
 #include "DeviceManager.h"
 #include "Graphics/GraphicsManager.h"
 #include"Graphics/ImGuiRenderer.h"
 #include "Camera.h"
-#include "EnemyPlantune.h"
+#include "EnemySlime.h"
 #include "EnemyManager.h"
 #include "EffectManager.h"
 #include "StageManager.h"
@@ -11,18 +11,15 @@
 
 #include "Graphics/Texture.h"
 #include "Mathf.h"
-#include "Ivy.h"
 #include "ObjManager.h"
-#include "Trash.h"
-#include "Goal.h"
 
 // 初期化
-void GameScene2::initialize()
+void StageReplacement::initialize()
 {
 	DeviceManager* deviceMgr = DeviceManager::instance();
 
 	// シーン定数バッファの作成
-	createBuffer<GameScene2::SceneConstants>(DeviceManager::instance()->getDevice(), buffer.GetAddressOf());
+	createBuffer<StageReplacement::SceneConstants>(DeviceManager::instance()->getDevice(), buffer.GetAddressOf());
 
 	//ステージの作成
 	stage = std::make_unique<Stage>();
@@ -38,15 +35,18 @@ void GameScene2::initialize()
 	cameraCtrl = std::make_unique<CameraController>();
 
 	//敵の作成と初期化
-		EnemyPlantune* plantune = new EnemyPlantune();
-		plantune->setPosition({ 2.0f,0.0f,5.0f });
+	//for (int i = 0;i < 2;++i)
+	//{
+	//	EnemySlime* slime = new EnemySlime();
+	//	slime->setPosition({ i*2.0f,0.0f,5.0f });
 
-		//敵管理クラスに取り付け
-		EnemyManager* eneMgr = EnemyManager::instance();
-		eneMgr->regist(plantune);
+	//	//敵管理クラスに取り付け
+	//	EnemyManager* eneMgr = EnemyManager::instance();
+	//	eneMgr->regist(slime);
+	//}
 
 	//ゲージ用スプライト
-	gauge = std::make_unique<Sprite>(deviceMgr->getDevice(), nullptr);
+	//gauge = std::make_unique<Sprite>(deviceMgr->getDevice(), nullptr);
 
 	//カメラ初期設定
 	Camera* camera = Camera::instance();
@@ -77,30 +77,22 @@ void GameScene2::initialize()
 		particle_bomb = std::make_unique<ParticleSystem>(deviceMgr->getDevice(), shader_resource_view, 5, 5);
 	}
 
-	Ivy* ivy = new Ivy();
-	ivy->setPosition({ -11, 0, -1 });
-	ObjManager::instance()->regist(ivy);
-
-	Trash* trash = new Trash();
-	trash->setPosition({ -10, 0, 2 });
-	ObjManager::instance()->regist(trash);
-
-	Goal* goal = new Goal();
-	goal->setPosition({ -20, 0, 2 });
-	ObjManager::instance()->regist(goal);
+	Theme = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Image\\タイトル入れ替え.png");
+	se = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Image\\se.png");
+	i = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Image\\i.png");
+	ka = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Image\\ka.png");
 }
 
 // 終了処理
-void GameScene2::finalize()
+void StageReplacement::finalize()
 {
 	//エネミー終了化
 	EnemyManager::instance()->clear();
 	EffectManager::instance()->finalize();
-	ObjManager::instance()->clear();
 }
 
 // 更新処理
-void GameScene2::update(float elapsedTime)
+void StageReplacement::update(float elapsedTime)
 {
 	//カメラ操作の更新
 	DirectX::XMFLOAT3 target = *(player->getPosition());
@@ -122,6 +114,7 @@ void GameScene2::update(float elapsedTime)
 	//	DirectX::XMVector3Normalize(
 	//	DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(&idealPos), DirectX::XMLoadFloat3(&actualpos)))
 	//);
+	//
 
 	//DirectX::XMVECTOR accel =
 	//	DirectX::XMVectorSubtract(
@@ -144,7 +137,7 @@ void GameScene2::update(float elapsedTime)
 	player->update(elapsedTime);
 
 	//タッチによる敵の出現
-	enemyPlacementByTouch(DeviceManager::instance()->getDeviceContext(), elapsedTime);
+	//enemyPlacementByTouch(DeviceManager::instance()->getDeviceContext());
 
 	//敵の更新処理
 	EnemyManager::instance()->update(elapsedTime);
@@ -152,7 +145,6 @@ void GameScene2::update(float elapsedTime)
 	//エフェクトの更新
 	EffectManager::instance()->update(elapsedTime);
 
-	ObjManager::instance()->update(elapsedTime);
 
 	////	パーティクルシステム更新
 	//if (particle_bomb)
@@ -179,7 +171,7 @@ void GameScene2::update(float elapsedTime)
 
 
 // 描画処理
-void GameScene2::render()
+void StageReplacement::render()
 {
 	DeviceManager* mgr = DeviceManager::instance();
 	GraphicsManager* graphics = GraphicsManager::instance();
@@ -255,8 +247,6 @@ void GameScene2::render()
 
 		//敵描画処理
 		EnemyManager::instance()->render(dc);
-
-		ObjManager::instance()->render(dc);
 	}
 
 	//3Dエフェクト描画
@@ -307,7 +297,31 @@ void GameScene2::render()
 
 	// 2D 描画
 	{
-		RenderEnemyGauge(dc, *view, *proj);
+		//RenderEnemyGauge(dc, *view, *proj);
+		Theme->render(dc,
+			100, 100, 400, 50,
+			1, 1, 1, 1,
+			0,
+			0, 0, 624, 47
+		);
+		se->render(dc,
+			550, 100, 40, 50,
+			1, 1, 1, 1,
+			0,
+			0, 0, 44, 43
+		);
+		i->render(dc,
+			100, 100, 400, 50,
+			1, 1, 1, 1,
+			0,
+			0, 0, 41, 38
+		);
+		ka->render(dc,
+			100, 100, 400, 50,
+			1, 1, 1, 1,
+			0,
+			0, 0, 45, 43
+		);
 	}
 
 	// 2DデバッグGUI描画
@@ -325,281 +339,151 @@ void GameScene2::render()
 
 
 //敵ライフゲージの描画
-void GameScene2::RenderEnemyGauge(
+void StageReplacement::RenderEnemyGauge(
 	ID3D11DeviceContext* dc,
 	const DirectX::XMFLOAT4X4& view,
-	const DirectX::XMFLOAT4X4& projection)
+	const DirectX::XMFLOAT4X4& projection
+)
 {
-	// ビューポート取得
+	//ビューポート
 	D3D11_VIEWPORT viewport;
 	UINT numViewports = 1;
 	dc->RSGetViewports(&numViewports, &viewport);
 
-	// 変換行列
+	//変換行列
 	DirectX::XMMATRIX viewMat = DirectX::XMLoadFloat4x4(&view);
 	DirectX::XMMATRIX projMat = DirectX::XMLoadFloat4x4(&projection);
 	DirectX::XMMATRIX worldMat = DirectX::XMMatrixIdentity();
 
-	// マウス入力
-	Mouse* mouse = InputManager::instance()->getMouse();
-	static Enemy* selectedEnemy = nullptr;
-	static bool isDragging = false;
-
-	// 敵マネージャー取得
+	//全ての敵の頭上にライフゲージを表示
 	EnemyManager* enemyMgr = EnemyManager::instance();
 	int enemyCount = enemyMgr->getEnemyCount();
 
 	for (int i = 0; i < enemyCount; ++i)
 	{
 		Enemy* enemy = enemyMgr->getEnemy(i);
-
-		// エネミーの頭上のワールド座標
+		//エネミーの頭上のワールド座標
 		DirectX::XMFLOAT3 worldPosition = *enemy->getPosition();
 		worldPosition.y += enemy->getHeight();
 
 		DirectX::XMVECTOR worldPositionVec = DirectX::XMLoadFloat3(&worldPosition);
 
-		// ワールド座標からスクリーン座標へ変換
+		//ワールド座標からスクリーン座標へ変換
 		DirectX::XMVECTOR screenPositionVec = DirectX::XMVector3Project(
 			worldPositionVec,
-			viewport.TopLeftX, viewport.TopLeftY,
-			viewport.Width, viewport.Height,
-			viewport.MinDepth, viewport.MaxDepth,
-			projMat, viewMat, worldMat
+			viewport.TopLeftX,
+			viewport.TopLeftY,
+			viewport.Width,
+			viewport.Height,
+			viewport.MinDepth,
+			viewport.MaxDepth,
+			projMat,
+			viewMat,
+			worldMat
 		);
 
-		// スクリーン座標取得
+		//スクリーン座標
 		DirectX::XMFLOAT2 screenPosition;
 		DirectX::XMStoreFloat2(&screenPosition, screenPositionVec);
 
-		// ゲージの長さ
+		//ゲージの長さ
 		const float gaugeWidth = 30.0f;
 		const float gaugeHeight = 5.0f;
 
 		float healthRate = enemy->getHealth() / static_cast<float>(enemy->getMaxHealth());
 
-		if (!clickGauge[i])
-		{
-			gaugeOffsets[enemy] = { screenPosition.x - gaugeWidth * 0.5f, screenPosition.y - gaugeHeight };
-		}
-
-		float& gaugeOffsetX = gaugeOffsets[enemy].x;
-		float& gaugeOffsetY = gaugeOffsets[enemy].y;
-
-		// マウス選択処理
-		if (mouse->getButtonDown() & Mouse::BTN_LEFT)
-		{
-			float mouseX = static_cast<float>(mouse->getPositionX());
-			float mouseY = static_cast<float>(mouse->getPositionY());
-
-			// マウスがゲージの範囲内にあるかチェック
-			if (mouseX >= gaugeOffsetX && mouseX <= gaugeOffsetX + gaugeWidth &&
-				mouseY >= gaugeOffsetY && mouseY <= gaugeOffsetY + gaugeHeight)
-			{
-				selectedEnemy = enemy;
-				isDragging = true;
-			}
-		}
-
-		// ドラッグ中に位置更新
-		if (isDragging && selectedEnemy == enemy && (mouse->getButton() & Mouse::BTN_LEFT))
-		{
-			gaugeOffsetX = static_cast<float>(mouse->getPositionX()) - gaugeWidth * 0.5f;
-			gaugeOffsetY = static_cast<float>(mouse->getPositionY()) - gaugeHeight;
-			clickGauge[i] = true;
-		}
-
-		// マウスボタンを離したらドロップ
-		if (isDragging && selectedEnemy == enemy && !(mouse->getButton() & Mouse::BTN_LEFT))
-		{
-			isDragging = false;
-
-			
-			
-		ObjManager* eneMgr = ObjManager::instance();
-
-		int enemyCount = eneMgr->getObjCount();
-		
-		for (int i = 0; i < enemyCount; i++)
-		{
-			Obj* enem = eneMgr->getObj(i);
-
-			Trash* trash = dynamic_cast<Trash*>(enem);
-			if (trash)
-			{
-				// Trashの頭上座標（あるいは中心など）を用意
-				DirectX::XMFLOAT3 trashPos = *trash->getPosition();
-				trashPos.y += trash->getHeight();
-
-				DirectX::XMVECTOR trashWorldVec = XMLoadFloat3(&trashPos);
-
-				// スクリーン座標に変換
-				DirectX::XMVECTOR trashScreenVec = XMVector3Project(
-					trashWorldVec,
-					viewport.TopLeftX, viewport.TopLeftY,
-					viewport.Width, viewport.Height,
-					viewport.MinDepth, viewport.MaxDepth,
-					projMat, viewMat, worldMat
-				);
-
-				DirectX::XMFLOAT2 trashScreenPos;
-				DirectX::XMStoreFloat2(&trashScreenPos, trashScreenVec);
-
-				// ゲージのスクリーン座標とサイズ
-				float gaugeLeft = gaugeOffsetX;
-				float gaugeTop = gaugeOffsetY;
-				float gaugeRight = gaugeOffsetX + gaugeWidth;
-				float gaugeBottom = gaugeOffsetY + gaugeHeight;
-
-				// Trashのスクリーン座標がその中にあるか
-				if (trashScreenPos.x+30 >= gaugeLeft && trashScreenPos.x <= gaugeRight &&
-					trashScreenPos.y+80 >= gaugeTop && trashScreenPos.y <= gaugeBottom)
-				{
-					gauge_b = false;
-					InputManager::instance()->attack = false;
-				}
-
-			}
-		}
-			selectedEnemy = nullptr;
-		}
-		ImGui::Begin("gauge");
-		ImGui::SliderFloat3("gp", &gaugeOffsetX, -5.0f, 5.0f);
-		ImGui::End();
-		if (gauge_b)
-		{
-			// ゲージ描画
-			gauge->render(
-				dc,
-				gaugeOffsetX, gaugeOffsetY,
-				gaugeWidth * healthRate, gaugeHeight,
-				1.0f, 0.0f, 0.0f, 1.0f,
-				0.0f,
-				0, 0,
-				static_cast<float>(gauge->getTextureWidth()),
-				static_cast<float>(gauge->getTextureHeight())
-			);
-		}
+		//ゲージ描画
+		gauge->render(
+			dc,
+			screenPosition.x - gaugeWidth * 0.5f,
+			screenPosition.y - gaugeHeight,
+			gaugeWidth * healthRate,
+			gaugeHeight,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			0.0f,
+			0, 0,
+			static_cast<float>(gauge->getTextureWidth()),
+			static_cast<float>(gauge->getTextureHeight())
+		);
 	}
 }
 
 //タッチによる敵の配置
-void GameScene2::enemyPlacementByTouch(ID3D11DeviceContext* dc, float elapsedTime)
+void StageReplacement::enemyPlacementByTouch(ID3D11DeviceContext* dc)
 {
-	static Enemy* selectedEnemy = nullptr;
-	static bool isDragging = false;
-
 	Camera* camera = Camera::instance();
 	const DirectX::XMFLOAT4X4* view = camera->getView();
 	const DirectX::XMFLOAT4X4* proj = camera->getProjection();
 
+	//ビューポート
 	D3D11_VIEWPORT viewport;
 	UINT numViewports = 1;
 	dc->RSGetViewports(&numViewports, &viewport);
 
+	//変換行列
 	DirectX::XMMATRIX viewMat = DirectX::XMLoadFloat4x4(view);
 	DirectX::XMMATRIX projMat = DirectX::XMLoadFloat4x4(proj);
 	DirectX::XMMATRIX worldMat = DirectX::XMMatrixIdentity();
 
+	//敵配置処理
 	Mouse* mouse = InputManager::instance()->getMouse();
-	/*const float doubleClickThreshold = 0.3f;
-	if (click) lastClickTime += elapsedTime;
-	if (lastClickTime > doubleClickThreshold)
-	{
-		click = !click;
-		lastClickTime = 0.0f;
-	}*/
-
-	// --- 敵選択処理 ---
 	if (mouse->getButtonDown() & Mouse::BTN_LEFT)
 	{
-		/*click = !click;
-		if (click) return;
-		if (lastClickTime > doubleClickThreshold)
-		{
-			lastClickTime = 0.0f;
-			return;
-		}
-		lastClickTime = 0.0f;*/
-		DirectX::XMFLOAT3 screenPosition{
-			static_cast<float>(mouse->getPositionX()),
-			static_cast<float>(mouse->getPositionY()),
-			0.0f
-		};
+		//マウスカーソル座標を取得
+		DirectX::XMFLOAT3 screenPosition;
+		screenPosition.x = static_cast<float>(mouse->getPositionX());
+		screenPosition.y = static_cast<float>(mouse->getPositionY());
 
-		DirectX::XMVECTOR screenPositionVec = DirectX::XMLoadFloat3(&screenPosition);
-		DirectX::XMVECTOR worldPositionVec = DirectX::XMVector3Unproject(
-			screenPositionVec, viewport.TopLeftX, viewport.TopLeftY,
-			viewport.Width, viewport.Height, viewport.MinDepth, viewport.MaxDepth,
-			projMat, viewMat, worldMat
+		DirectX::XMVECTOR screenPositionVec, worldPositionVec;
+
+		//レイの始点を計算
+		screenPosition.z = 0.0f; //カメラに一番近い位置
+		screenPositionVec = DirectX::XMLoadFloat3(&screenPosition);
+		worldPositionVec = DirectX::XMVector3Unproject(
+			screenPositionVec,
+			viewport.TopLeftX,
+			viewport.TopLeftY,
+			viewport.Width,
+			viewport.Height,
+			viewport.MinDepth,
+			viewport.MaxDepth,
+			projMat,
+			viewMat,
+			worldMat
 		);
 
 		DirectX::XMFLOAT3 rayStart;
 		DirectX::XMStoreFloat3(&rayStart, worldPositionVec);
 
-		screenPosition.z = 1.0f;
+		//レイの終点を計算
+		screenPosition.z = 1.0f;	//カメラに一番遠い位置
 		screenPositionVec = DirectX::XMLoadFloat3(&screenPosition);
 		worldPositionVec = DirectX::XMVector3Unproject(
-			screenPositionVec, viewport.TopLeftX, viewport.TopLeftY,
-			viewport.Width, viewport.Height, viewport.MinDepth, viewport.MaxDepth,
-			projMat, viewMat, worldMat
+			screenPositionVec,
+			viewport.TopLeftX,
+			viewport.TopLeftY,
+			viewport.Width,
+			viewport.Height,
+			viewport.MinDepth,
+			viewport.MaxDepth,
+			projMat,
+			viewMat,
+			worldMat
 		);
-
 		DirectX::XMFLOAT3 rayEnd;
 		DirectX::XMStoreFloat3(&rayEnd, worldPositionVec);
 
-		if (!isDragging)
-		{
-			selectedEnemy = EnemyManager::instance()->getEnemyByRay(rayStart, rayEnd);
-			if (selectedEnemy)
-			{
-				isDragging = true;
-			}
-		}
-	}
+		//レイキャスト
+		//HitResult hit;
+		//if (stage->raycast(rayStart, rayEnd, hit))
+		//{
+		//	//敵を配置
+		//	EnemySlime* slime = new EnemySlime();
+		//	slime->setPosition(hit.position);
+		//	EnemyManager::instance()->regist(slime);
+		//}
 
-	// --- ドラッグ中の敵の位置を更新 ---
-	if (isDragging && selectedEnemy && mouse->getButton() & Mouse::BTN_LEFT)
-	{
-		DirectX::XMFLOAT3 screenPosition{
-			static_cast<float>(mouse->getPositionX()),
-			static_cast<float>(mouse->getPositionY()),
-			0.0f
-		};
 
-		DirectX::XMVECTOR screenPositionVec = DirectX::XMLoadFloat3(&screenPosition);
-		DirectX::XMVECTOR worldPositionVec = DirectX::XMVector3Unproject(
-			screenPositionVec, viewport.TopLeftX, viewport.TopLeftY,
-			viewport.Width, viewport.Height, viewport.MinDepth, viewport.MaxDepth,
-			projMat, viewMat, worldMat
-		);
-
-		DirectX::XMFLOAT3 rayStart;
-		DirectX::XMStoreFloat3(&rayStart, worldPositionVec);
-
-		screenPosition.z = 1.0f;
-		screenPositionVec = DirectX::XMLoadFloat3(&screenPosition);
-		worldPositionVec = DirectX::XMVector3Unproject(
-			screenPositionVec, viewport.TopLeftX, viewport.TopLeftY,
-			viewport.Width, viewport.Height, viewport.MinDepth, viewport.MaxDepth,
-			projMat, viewMat, worldMat
-		);
-
-		DirectX::XMFLOAT3 rayEnd;
-		DirectX::XMStoreFloat3(&rayEnd, worldPositionVec);
-
-		/*HitResult hit;
-		if (stage->raycast(rayStart, rayEnd, hit))
-		{
-			selectedEnemy->setPosition(hit.position);
-		}*/
-	}
-
-	// --- ドロップ処理 ---
-	if (isDragging && selectedEnemy && !(mouse->getButton() & Mouse::BTN_LEFT))
-	{
-		isDragging = false;
-
-		selectedEnemy = nullptr;
 	}
 }
+

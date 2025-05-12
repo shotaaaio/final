@@ -5,11 +5,11 @@
 #include<algorithm>
 #include"Player.h"
 #include"Mathf.h"
+#include "EnemyManager.h"
 
 //更新処理
 void CameraController::update(float elapsedTime,float rot)
 {
-	//カメラの回転
 	rotateCameraAngle(elapsedTime);
 
 	//びたびたのカメラ位置

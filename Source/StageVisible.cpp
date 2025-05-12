@@ -1,5 +1,4 @@
-
-#include "GameScene.h"
+#include "StageVisible.h"
 #include "DeviceManager.h"
 #include "Graphics/GraphicsManager.h"
 #include"Graphics/ImGuiRenderer.h"
@@ -14,12 +13,12 @@
 #include "Mathf.h"
 
 // 初期化
-void GameScene::initialize()
+void StageVisible::initialize()
 {
 	DeviceManager* deviceMgr = DeviceManager::instance();
 
 	// シーン定数バッファの作成
-	createBuffer<GameScene::SceneConstants>(DeviceManager::instance()->getDevice(), buffer.GetAddressOf());
+	createBuffer<StageVisible::SceneConstants>(DeviceManager::instance()->getDevice(), buffer.GetAddressOf());
 
 	//ステージの作成
 	stage = std::make_unique<Stage>();
@@ -33,21 +32,22 @@ void GameScene::initialize()
 
 	//カメラ操作の初期化
 	cameraCtrl = std::make_unique<CameraController>();
+	//cameraCtrl->setPlayer(player.get());
 
 	//敵の作成と初期化
-	//for (int i = 0;i < 2;++i)
-	//{
-	//	EnemySlime* slime = new EnemySlime();
-	//	slime->setPosition({ i*2.0f,0.0f,5.0f });
+	for (int i = 0;i < 2;++i)
+	{
+		EnemySlime* slime = new EnemySlime();
+		slime->setPosition({ i*2.0f,0.0f,5.0f });
 
-	//	//敵管理クラスに取り付け
-	//	EnemyManager* eneMgr = EnemyManager::instance();
-	//	eneMgr->regist(slime);
-	//}
+		//敵管理クラスに取り付け
+		EnemyManager* eneMgr = EnemyManager::instance();
+		eneMgr->regist(slime);
+	}
 
 	//ゲージ用スプライト
 	//gauge = std::make_unique<Sprite>(deviceMgr->getDevice(), nullptr);
-	
+
 	//カメラ初期設定
 	Camera* camera = Camera::instance();
 	camera->setLookAt(
@@ -79,7 +79,7 @@ void GameScene::initialize()
 }
 
 // 終了処理
-void GameScene::finalize()
+void StageVisible::finalize()
 {
 	//エネミー終了化
 	EnemyManager::instance()->clear();
@@ -87,7 +87,7 @@ void GameScene::finalize()
 }
 
 // 更新処理
-void GameScene::update(float elapsedTime)
+void StageVisible::update(float elapsedTime)
 {
 	//カメラ操作の更新
 	DirectX::XMFLOAT3 target = *(player->getPosition());
@@ -162,11 +162,20 @@ void GameScene::update(float elapsedTime)
 	//	}
 	//	particle_bomb->Update(elapsedTime);
 	//}
+
+	//カメラの回転
+	if (!isEnemyVisible()) enemyVisibleTime += elapsedTime;
+	else enemyVisibleTime = 0.0f;
+
+	if (player)
+	{
+		if (enemyVisibleTime >= 5.0f) player->IsGoal = true;
+	}
 }
 
 
 // 描画処理
-void GameScene::render()
+void StageVisible::render()
 {
 	DeviceManager* mgr = DeviceManager::instance();
 	GraphicsManager* graphics = GraphicsManager::instance();
@@ -184,21 +193,21 @@ void GameScene::render()
 	Camera* camera = Camera::instance();
 	const DirectX::XMFLOAT4X4* view = camera->getView();
 	const DirectX::XMFLOAT4X4* proj = camera->getProjection();
-	
+
 	// 3D モデルの描画に必要な情報
 	SceneConstants sc;
 
 	//ビュー行列
 	DirectX::XMMATRIX View = DirectX::XMLoadFloat4x4(view);
-	
+
 	//プロジェクション行列
 	DirectX::XMMATRIX Projection = DirectX::XMLoadFloat4x4(proj);
-	
+
 	DirectX::XMStoreFloat4x4(&sc.viewProjection, View * Projection);
-	
+
 	// ライト方向（下方向）
 	sc.lightDirection = { 0.0f, -1.0f, 0.0f, 0.0f };
-	
+
 	// 3D 描画に利用する定数バッファの更新と設定
 	bindBuffer(dc, 1, buffer.GetAddressOf(), &sc);
 
@@ -217,11 +226,11 @@ void GameScene::render()
 		DirectX::XMFLOAT4X4 inverse_view_projection;
 		//カメラの逆行列
 		DirectX::XMStoreFloat4x4(&inverse_view_projection, DirectX::XMMatrixInverse(nullptr, View * Projection));
-		skymap->Render(dc,camera->getEye(),inverse_view_projection);
+		skymap->Render(dc, camera->getEye(), inverse_view_projection);
 	}
 
 	// 3D 描画設定
-	graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc){
+	graphics->SettingRenderContext([](ID3D11DeviceContext* dc, RenderContext* rc) {
 		// サンプラーステートの設定（アニソトロピック）
 		dc->PSSetSamplers(0, 1, rc->samplerStates[static_cast<uint32_t>(SAMPLER_STATE::ANISOTROPIC)].GetAddressOf());
 		// ブレンドステートの設定（アルファ）
@@ -230,7 +239,7 @@ void GameScene::render()
 		dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::ON_ON)].Get(), 0);
 		// ラスタライザステートの設定（ソリッド、裏面表示オフ）
 		dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
-	});
+		});
 
 	// 3D 描画
 	{
@@ -268,7 +277,7 @@ void GameScene::render()
 	// 3Dデバッグ描画
 	{
 		// ラインレンダラ描画実行
-		graphics->getLineRenderer()->render(dc, *view,*proj);
+		graphics->getLineRenderer()->render(dc, *view, *proj);
 
 		// デバッグレンダラ描画実行
 		graphics->getDebugRenderer()->render(dc, *view, *proj);
@@ -288,7 +297,7 @@ void GameScene::render()
 		dc->OMSetDepthStencilState(rc->depthStencilStates[static_cast<uint32_t>(DEPTH_STENCIL_STATE::OFF_OFF)].Get(), 0);
 		// ラスタライザステートの設定（ソリッド、裏面表示オフ）
 		dc->RSSetState(rc->rasterizerStates[static_cast<uint32_t>(RASTERIZER_STATE::SOLID_CULLNONE)].Get());
-	});
+		});
 
 	// 2D 描画
 	{
@@ -310,7 +319,7 @@ void GameScene::render()
 
 
 //敵ライフゲージの描画
-void GameScene::RenderEnemyGauge(
+void StageVisible::RenderEnemyGauge(
 	ID3D11DeviceContext* dc,
 	const DirectX::XMFLOAT4X4& view,
 	const DirectX::XMFLOAT4X4& projection
@@ -330,7 +339,7 @@ void GameScene::RenderEnemyGauge(
 	EnemyManager* enemyMgr = EnemyManager::instance();
 	int enemyCount = enemyMgr->getEnemyCount();
 
-	for (int i = 0;i < enemyCount;++i)
+	for (int i = 0; i < enemyCount; ++i)
 	{
 		Enemy* enemy = enemyMgr->getEnemy(i);
 		//エネミーの頭上のワールド座標
@@ -380,7 +389,7 @@ void GameScene::RenderEnemyGauge(
 }
 
 //タッチによる敵の配置
-void GameScene::enemyPlacementByTouch(ID3D11DeviceContext* dc)
+void StageVisible::enemyPlacementByTouch(ID3D11DeviceContext* dc)
 {
 	Camera* camera = Camera::instance();
 	const DirectX::XMFLOAT4X4* view = camera->getView();
@@ -446,14 +455,64 @@ void GameScene::enemyPlacementByTouch(ID3D11DeviceContext* dc)
 
 		//レイキャスト
 		HitResult hit;
-		if (stage->raycast(rayStart, rayEnd, hit))
-		{
-			//敵を配置
-			EnemySlime* slime = new EnemySlime();
-			slime->setPosition(hit.position);
-			EnemyManager::instance()->regist(slime);
-		}
+		//if (stage->raycast(rayStart, rayEnd, hit))
+		//{
+		//	//敵を配置
+		//	EnemySlime* slime = new EnemySlime();
+		//	slime->setPosition(hit.position);
+		//	EnemyManager::instance()->regist(slime);
+		//}
 
 
 	}
+}
+
+bool StageVisible::isEnemyVisible()
+{
+	const float screenWidth = 1280.0f;
+	const float screenHeight = 720.0f;
+
+	EnemyManager* eneMgr = EnemyManager::instance();
+	int enemyCount = eneMgr->getEnemyCount();
+
+	const DirectX::XMMATRIX view = XMLoadFloat4x4(Camera::instance()->getView());
+	const DirectX::XMMATRIX projection = XMLoadFloat4x4(Camera::instance()->getProjection());
+	const DirectX::XMMATRIX vp = XMMatrixMultiply(view, projection);
+
+	for (int i = 0; i < enemyCount; ++i)
+	{
+		Enemy* enemy = eneMgr->getEnemy(i);
+		if (!enemy) continue;
+
+		float radius = enemy->getRadius() * 1.5f; // 敵の大きさ（あらかじめ取得できるようにしておく）
+
+		DirectX::XMFLOAT3 pos = *enemy->getPosition();
+		DirectX::XMVECTOR worldPos = XMLoadFloat3(&pos);
+
+		// ワールド空間からビュー空間へ
+		DirectX::XMVECTOR viewPos = XMVector3Transform(worldPos, view);
+
+		// 半径をカメラ空間（Z方向）に投影してスクリーン上のサイズに変換
+		float z = DirectX::XMVectorGetZ(viewPos);
+		if (z <= 0.1f) continue; // カメラより後ろ（または近すぎ）はスキップ
+
+		float radiusNDC = (radius / z) * projection.r[1].m128_f32[1]; // FOV依存で調整
+
+
+		DirectX::XMVECTOR clipPos = XMVector3TransformCoord(worldPos, vp);
+		float x = DirectX::XMVectorGetX(clipPos);
+		float y = DirectX::XMVectorGetY(clipPos);
+
+
+		if (x + radiusNDC < -1.0f || x - radiusNDC > 1.0f ||
+			y + radiusNDC < -1.0f || y - radiusNDC > 1.0f)
+		{
+			continue; // 完全に画面外
+		}
+
+		// 画面内に一部でも映ってる
+		return true;
+	}
+
+	return false;
 }

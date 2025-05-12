@@ -33,8 +33,8 @@ Player::Player()
 	boneIndex = model->findBoneIndex("NIC:wand2_BK",meshIndex);
 
 	//それぞれのボタン入力の行動を設定
-	Key_c = std::bind(&Player::FlyingStraightBullet,this);
-	Key_v = std::bind(&Player::FlyingHomingBullet,this);
+	/*Key_c = std::bind(&Player::FlyingStraightBullet,this);
+	Key_v = std::bind(&Player::FlyingHomingBullet,this);*/
 	Key_z = std::bind(&Player::JumpAction, this);
 	Key_x = std::bind(&Player::Attack, this);
 
@@ -47,6 +47,12 @@ Player::Player()
 	whiteImage = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Image\\white.jpg");
 
 	clearText = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Font\\clear.png");
+
+	timerText = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Font\\font4.png");
+
+	rankText = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Font\\rank.png");
+
+	secondsText = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Font\\seconds.png");
 }
 
 //デストラクタ
@@ -57,7 +63,11 @@ Player::~Player()
 //更新処理
 void Player::update(float elapsedTime)
 {
-	if (!move_b) {
+	/*if (!IsLookEnemy(elapsedTime))
+	{
+		return;
+	}*/
+	if (IsGoal) {
 		updateTransform();
 		return;
 	}
@@ -77,17 +87,19 @@ void Player::update(float elapsedTime)
 	updateVelocity(elapsedTime);
 
 	//弾更新処理
-	bulletMgr.update(elapsedTime);
+	//bulletMgr.update(elapsedTime);
 
 	//プレイヤーと敵との衝突処置
 	collisionPlayerAndEnemies();
 
 	//敵と弾の衝突判定
-	collisionBulletAndEnemies();
+	//collisionBulletAndEnemies();
 
 	Hashigo();
 
 	inGoal();
+
+	Timer(elapsedTime);
 
 	//アニメーションの更新
 	updateAnimation(elapsedTime);
@@ -122,7 +134,7 @@ void Player::render(ID3D11DeviceContext* dc)
 
 	if (IsGoal)
 	{
-		if (white_a <= 0.5)white_a += 0.002;
+		if (white_a <= 0.5)white_a += 0.002f;
 
 		whiteImage->render(dc,
 			0, 0, 1280, 720,
@@ -171,6 +183,36 @@ void Player::render(ID3D11DeviceContext* dc)
 			);
 		}
 	}
+
+		/*if (clear_b)
+		{*/
+			if (two)
+			{
+				timerText->render(dc,
+					920, 280, 60, 60,
+					0, 0, 0, 1,
+					0,
+					time1, 60, 20, 20);
+			}
+
+			timerText->render(dc,
+				970, 280, 60, 60,
+				0, 0, 0, 1,
+				0,
+				time2, 60, 20, 20);
+
+			secondsText->render(dc,
+				1040, 280, 60, 60,
+				1, 1, 1, 1,
+				0,
+				0, 0, 47, 46);
+
+			rankText->render(dc,
+				950, 350, 90, 90,
+				1, 1, 0, 1,
+				0,
+				rank, 0, 36, 38);
+		//}
 
 	//弾描画処理
 	bulletMgr.render(dc);
@@ -481,106 +523,63 @@ void Player::onLanding()
 void Player::Hashigo()
 {
 	ObjManager* eneMgr = ObjManager::instance();
-
 	int enemyCount = eneMgr->getObjCount();
 	isOnLadder = false;
+
 	for (int i = 0; i < enemyCount; i++)
 	{
 		Obj* enemy = eneMgr->getObj(i);
+		if (!enemy) continue;  // nullチェック
 
+		// Ivyにキャストできるか
 		Ivy* ivy = dynamic_cast<Ivy*>(enemy);
-		if (ivy)
+		const DirectX::XMFLOAT3* enePos = enemy->getPosition();
+		if (!enePos) continue; // nullチェック
+
+		DirectX::XMFLOAT3 outVec;
+		if (Collision::intersectCylinderAndCylinder(position, radius, height, *enePos, enemy->getRadius(), enemy->getHeight(), outVec))
 		{
-			DirectX::XMFLOAT3 outVec;
-
-			if (Collision::intersectCylinderAndCylinder(position, radius, height, *ivy->getPosition(), ivy->getRadius(), ivy->getHeight(), outVec))
-			{
-
-				DirectX::XMFLOAT3 toIvyVec = {
-				ivy->getPosition()->x - position.x,
+			//Ivy以外の当たり判定
+			DirectX::XMFLOAT3 toEnemyVec = {
+				enePos->x - position.x,
 				0.0f,
-				ivy->getPosition()->z - position.z
-				};
+				enePos->z - position.z
+			};
 
-				// スティックの入力
-				GamePad* gamePad = InputManager::instance()->getGamePad();
-				float ax = gamePad->getAxisLX();
-				float ay = gamePad->getAxisLY();
+			GamePad* gamePad = InputManager::instance()->getGamePad();
+			float ax = gamePad->getAxisLX();
+			float ay = gamePad->getAxisLY();
 
-				// 正規化
-				DirectX::XMVECTOR inputVec = DirectX::XMVector3Normalize(DirectX::XMVectorSet(ax, 0, ay, 0));
-				DirectX::XMVECTOR toIvy = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&toIvyVec));
+			DirectX::XMVECTOR inputVec = DirectX::XMVector3Normalize(DirectX::XMVectorSet(ax, 0, ay, 0));
+			DirectX::XMVECTOR toEnemy = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&toEnemyVec));
+			float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(inputVec, toEnemy));
 
-				// 入力ベクトルがツタの方向と近ければ上昇
-				float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(inputVec, toIvy));
-				if ((ax != 0 || ay != 0) && dot > 0.7f)
-				{
-					isOnLadder = true;
-					velocity.x = 0;
-					velocity.y = 2;
-					velocity.z = 0;
-				}
-				else
-				{
-					velocity.y = 0;
-				}
-
-				if (attack_count >= 10)
-				{
-					if (GetKeyState('F') < 0)
-					{
-						DirectX::XMFLOAT3 eneScale = *enemy->getScale();
-						eneScale.y = 0.01f;
-						eneScale.z = 0.01f;
-						enemy->setScale(eneScale);
-						enemy->setHeight(7);
-					}
-				}
-
-				////Search();
-
-				//search_b = true;
+			if ((ax != 0 || ay != 0) && dot > 0.7f)
+			{
+				isOnLadder = true;
+				velocity = { 0, ivy ? 2.0f : 0.0f, 0 }; // Ivy の場合だけ上昇
 			}
-			/*else
-				search_b = false;*/
-		}
-		else
-		{
-			DirectX::XMFLOAT3 outVec;
-
-			if (Collision::intersectCylinderAndCylinder(position, radius, height, *enemy->getPosition(), enemy->getRadius(), enemy->getHeight(), outVec))
+			else
 			{
-				DirectX::XMFLOAT3 toEnemyVec = {
-				enemy->getPosition()->x - position.x,
-				0.0f,
-				enemy->getPosition()->z - position.z
-				};
+				velocity.y = 0;
+			}
 
-				// スティックの入力
-				GamePad* gamePad = InputManager::instance()->getGamePad();
-				float ax = gamePad->getAxisLX();
-				float ay = gamePad->getAxisLY();
-
-				// 正規化
-				DirectX::XMVECTOR inputVec = DirectX::XMVector3Normalize(DirectX::XMVectorSet(ax, 0, ay, 0));
-				DirectX::XMVECTOR toIvy = DirectX::XMVector3Normalize(DirectX::XMLoadFloat3(&toEnemyVec));
-
-				// 入力ベクトルがツタの方向と近ければ上昇
-				float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(inputVec, toIvy));
-				if ((ax != 0 || ay != 0) && dot > 0.7f)
+			// Ivy かつ Fキーで大きくする処理
+			if (ivy && attack_count >= 10 && GetKeyState('F') < 0)
+			{
+				const DirectX::XMFLOAT3* scale = enemy->getScale();
+				if (scale)
 				{
-					isOnLadder = true;
-					velocity.x = 0;
-					velocity.y = 0;
-					velocity.z = 0;
-				}
-				else
-				{
-					velocity.y = 0;
+					DirectX::XMFLOAT3 eneScale = *scale;
+					eneScale.y = 0.01f;
+					eneScale.z = 0.01f;
+					enemy->setScale(eneScale);
+					enemy->setHeight(7);
 				}
 			}
 		}
 	}
+
 }
 
 void Player::inGoal()
@@ -601,9 +600,87 @@ void Player::inGoal()
 			if (Collision::intersectCylinderAndCylinder(position, radius, height, *ivy->getPosition(), ivy->getRadius(), ivy->getHeight(), outVec))
 			{
 				IsGoal = true;
-				move_b = false;
 				//SceneManager::instance()->changeScene(new SceneClear);
 			}
 		}
 	}
 }
+
+void Player::Timer(float elapsedTime)
+{
+	// フレーム毎の更新処理
+	seconds += elapsedTime;
+	static float timerForTime2 = 0.0f;
+	timerForTime2 += elapsedTime;
+
+	// 毎秒（1秒ごと）に time2 を一気に 20 右へ
+	if (timerForTime2 >= 1.0f)
+	{
+		time2 += 20;
+		timerForTime2 -= 1.0f;  // 1秒分だけ引く（10秒までカウントできるように）
+	}
+
+	// 10秒経ったら time1 を20右に、time2をリセット
+	if (time2 >= 200) // 1秒20px × 10秒 = 200px
+	{
+		time1 += 20;
+		time2 = 0;
+		two = true;
+	}
+
+	if (seconds < 10) rank = 0;
+	else if (seconds < 20) rank = 38;
+	else if (seconds < 30) rank = 72;
+
+	/*if (timer > 1000)
+	{
+		if (position.x >= 23 && position.x <= 24 && position.z >= -0.5f && position.z <= 0.5f)
+		{
+			stop = true;
+		}
+	}*/
+}
+
+void Player::onRayCastHit(DirectX::XMFLOAT3 s, DirectX::XMFLOAT3 e)
+{
+	// velocityベクトル
+	DirectX::XMVECTOR vVel = DirectX::XMLoadFloat3(&velocity);
+
+	// カメラの右ベクトル（Right Vector）を取得する必要があります
+	// 仮に cameraRight が取得済みとする
+	//カメラの前方向を取得
+	Camera* camera = Camera::instance();
+	const DirectX::XMFLOAT3* cameraRight = camera->getRight();
+	DirectX::XMVECTOR vCameraRight = DirectX::XMLoadFloat3(cameraRight);
+
+	// 内積をとって、右方向に進んでいるか確認
+	float dot = DirectX::XMVectorGetX(DirectX::XMVector3Dot(vVel, vCameraRight));
+	if (dot > 0) {
+		if (IsStageEast) IsGoal = true;
+	}
+}
+
+void Player::Chase(float elapsedTime)
+{
+	EnemyManager* enemyMgr = EnemyManager::instance();
+
+	int enemyCount = enemyMgr->getEnemyCount();
+
+		for (int j = 0; j < enemyCount; ++j)
+		{
+			Enemy* enemy = EnemyManager::instance()->getEnemy(j);
+			DirectX::XMVECTOR ePos = DirectX::XMLoadFloat3(enemy->getPosition());
+			DirectX::XMVECTOR direction = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(ePos, DirectX::XMLoadFloat3(&position)));
+
+			// 速度を定義（例：1.0f 単位／秒）
+			float speed = 1.0f;
+			DirectX::XMVECTOR velocity = DirectX::XMVectorScale(direction, speed * elapsedTime);
+
+			// 移動
+			ePos = DirectX::XMVectorAdd(ePos, velocity);
+
+			//enemy->setPosition(DirectX::ePos)
+		}
+
+}
+

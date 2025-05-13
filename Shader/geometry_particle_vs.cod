@@ -46,7 +46,7 @@ dcl_temps 4
 //   o1.x <- <main return value>.size.x; o1.y <- <main return value>.size.y; 
 //   o0.x <- <main return value>.position.x; o0.y <- <main return value>.position.y; o0.z <- <main return value>.position.z
 //
-#line 6 "C:\Users\2230023\OneDrive - yamaguchigakuen\チEクトップ\final\HLSL\geometry_particle_vs.hlsl"
+#line 6 "C:\Users\2230083\Desktop\そこに愛EŤるんか\HLSL\geometry_particle_vs.hlsl"
 mov r0.xyz, v0.xyzx  // r0.x <- output.position.x; r0.y <- output.position.y; r0.z <- output.position.z
 
 #line 7

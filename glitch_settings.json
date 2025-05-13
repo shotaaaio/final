@@ -1,0 +1,15 @@
+{
+    "brightness": 0.0,
+    "density": 1.0,
+    "flash_frequency": 10.0,
+    "flash_strength": 0.0,
+    "glitch_sampling_count": 0,
+    "line_impact": 0.0,
+    "rect_noise_height": 1.0,
+    "rect_noise_strength": 0.00800000037997961,
+    "rect_noise_width": 0.0,
+    "shift": 0.0,
+    "time": 0.6666666865348816,
+    "x_shifting": 0.00800000037997961,
+    "y_shifting": 0.00800000037997961
+}

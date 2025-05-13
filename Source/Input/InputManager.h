@@ -30,6 +30,8 @@ public:
 	// ƒ}ƒEƒXæ“¾
 	Mouse* getMouse() { return mouse.get(); }
 
+	bool attack = true;
+
 private:
 	static InputManager*	inst;
 

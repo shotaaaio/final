@@ -39,3 +39,4 @@ public:
 private:
 	std::map<std::wstring, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> resources;
 };
+

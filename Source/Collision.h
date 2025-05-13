@@ -1,8 +1,6 @@
 #pragma once
 #include<DirectXMath.h>
-
-class SkinnedMesh;
-
+#include "Graphics/SkinnedMesh.h"
 //ヒット結果（レイキャスト後に取得したい情報）
 struct HitResult
 {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include"Character.h"
-#include"BulletManager.h"
+//#include"BulletManager.h"
 #include"Effect.h"
 
 #include<functional>
@@ -29,7 +29,7 @@ public:
 	void collisionPlayerAndEnemies();
 
 	//敵と弾の衝突判定
-	void collisionBulletAndEnemies();
+	//void collisionBulletAndEnemies();
 
 	//移動入力処理
 	void InputMove(float elapsedTime);
@@ -37,8 +37,8 @@ public:
 	//アクション
 	void JumpAction();
 	void Attack();
-	void FlyingStraightBullet();
-	void FlyingHomingBullet();
+	//void FlyingStraightBullet();
+	//void FlyingHomingBullet();
 
 	//入力受付
 	void inputAction();
@@ -49,6 +49,10 @@ protected:
 private:
 	//入力値から移動ベクトルを取得
 	DirectX::XMFLOAT3 getMoveVec()const;
+
+	void Hashigo();
+
+	void inGoal();
 private:
 	//移動スピード
 	float moveSpeed = 5.0f;
@@ -66,7 +70,7 @@ private:
 	int jumpLimit = 2;
 
 	//弾管理
-	BulletManager bulletMgr;
+	//BulletManager bulletMgr;
 
 	std::unique_ptr<Effect> hitEffect;
 	std::unique_ptr<Effect> onLandingEffect;
@@ -80,6 +84,14 @@ private:
 	std::function<void()> Key_v;
 	std::function<void()> Key_z;
 	std::function<void()> Key_x;
+
+	bool isOnLadder;
+
+	int attack_count = 0;
+
+	bool IsGoal = false;//true...ゴールした
+
+	bool move_b = true;//true...プレイヤーが動ける
 };
 
 enum class NodeState

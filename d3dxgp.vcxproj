@@ -70,6 +70,24 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>.\Utils\stb;$(IncludePath);$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>.\Utils\stb;$(IncludePath);$(IncludePath)</IncludePath>
+    <ExternalIncludePath>$(ExternalIncludePath)</ExternalIncludePath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>.\Utils\stb;$(VC_IncludePath);$(WindowsSDK_IncludePath);;$(IncludePath)</IncludePath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>.\Utils\stb;$(VC_IncludePath);$(WindowsSDK_IncludePath);;$(IncludePath)</IncludePath>
+    <ExecutablePath>$(ExecutablePath)</ExecutablePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -176,14 +194,18 @@
     <ClCompile Include="Source\EffectManager.cpp" />
     <ClCompile Include="Source\Enemy.cpp" />
     <ClCompile Include="Source\EnemyManager.cpp" />
+    <ClCompile Include="Source\EnemyPlantune.cpp" />
     <ClCompile Include="Source\EnemySlime.cpp" />
     <ClCompile Include="Source\Framework.cpp" />
     <ClCompile Include="Source\GameScene.cpp" />
+    <ClCompile Include="Source\GameScene2.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer.cpp" />
+    <ClCompile Include="Source\Graphics\GaussianBlurShader.cpp" />
+    <ClCompile Include="Source\Graphics\Glitch_Effect_Shader.cpp" />
     <ClCompile Include="Source\Graphics\GraphicsManager.cpp" />
     <ClCompile Include="Source\Graphics\ImGuiRenderer.cpp" />
     <ClCompile Include="Source\Graphics\LineRenderer.cpp" />
-    <ClCompile Include="Source\Graphics\Shader.cpp" />
+    <ClCompile Include="Source\Graphics\ShaderManager.cpp" />
     <ClCompile Include="Source\Graphics\SkinnedMesh.cpp" />
     <ClCompile Include="Source\Graphics\Skymap.cpp" />
     <ClCompile Include="Source\Graphics\Sprite.cpp" />
@@ -193,11 +215,17 @@
     <ClCompile Include="Source\Input\InputManager.cpp" />
     <ClCompile Include="Source\Input\Mouse.cpp" />
     <ClCompile Include="Source\LoadingScene.cpp" />
+    <ClCompile Include="Source\LuminanceExtractionShader.cpp" />
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\Mathf.cpp" />
+    <ClCompile Include="Source\obj.cpp" />
     <ClCompile Include="Source\Object.cpp" />
+    <ClCompile Include="Source\ObjManager.cpp" />
+    <ClCompile Include="Source\OcclusionQuery.cpp" />
     <ClCompile Include="Source\particle\particle_system.cpp" />
     <ClCompile Include="Source\Player.cpp" />
+    <ClCompile Include="Source\PostprocessingRenderer.cpp" />
+    <ClCompile Include="Source\RenderTarget.cpp" />
     <ClCompile Include="Source\SceneManager.cpp" />
     <ClCompile Include="Source\Stage.cpp" />
     <ClCompile Include="Source\StraightBullet.cpp" />
@@ -223,36 +251,48 @@
     <ClInclude Include="Source\EffectManager.h" />
     <ClInclude Include="Source\Enemy.h" />
     <ClInclude Include="Source\EnemyManager.h" />
+    <ClInclude Include="Source\EnemyPlantune.h" />
     <ClInclude Include="Source\EnemySlime.h" />
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\GameScene.h" />
+    <ClInclude Include="Source\GameScene2.h" />
     <ClInclude Include="Source\Graphics\Buffer.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer.h" />
+    <ClInclude Include="Source\Graphics\Glitch_Effect_Shader.h" />
     <ClInclude Include="Source\Graphics\GraphicsManager.h" />
     <ClInclude Include="Source\Graphics\ImGuiRenderer.h" />
     <ClInclude Include="Source\Graphics\LineRenderer.h" />
-    <ClInclude Include="Source\Graphics\Shader.h" />
+    <ClInclude Include="Source\Graphics\ShaderManager.h" />
     <ClInclude Include="Source\Graphics\SkinnedMesh.h" />
     <ClInclude Include="Source\Graphics\Skymap.h" />
     <ClInclude Include="Source\Graphics\Sprite.h" />
     <ClInclude Include="Source\Graphics\Texture.h" />
+    <ClInclude Include="Source\Graphics\GaussianBlurShader.h" />
     <ClInclude Include="Source\high_resolution_timer.h" />
     <ClInclude Include="Source\HomingBullet.h" />
     <ClInclude Include="Source\Input\GamePad.h" />
     <ClInclude Include="Source\Input\InputManager.h" />
     <ClInclude Include="Source\Input\Mouse.h" />
     <ClInclude Include="Source\LoadingScene.h" />
+    <ClInclude Include="Source\LuminanceExtractionShader.h" />
     <ClInclude Include="Source\Mathf.h" />
     <ClInclude Include="Source\misc.h" />
+    <ClInclude Include="Source\obj.h" />
     <ClInclude Include="Source\Object.h" />
+    <ClInclude Include="Source\ObjManager.h" />
+    <ClInclude Include="Source\OcclusionQuery.h" />
     <ClInclude Include="Source\particle\particle_system.h" />
     <ClInclude Include="Source\Player.h" />
+    <ClInclude Include="Source\PostprocessingRenderer.h" />
+    <ClInclude Include="Source\RenderTarget.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\SceneManager.h" />
+    <ClInclude Include="Source\Shader.h" />
     <ClInclude Include="Source\Stage.h" />
     <ClInclude Include="Source\StageManager.h" />
     <ClInclude Include="Source\StraightBullet.h" />
     <ClInclude Include="Source\TitleScene.h" />
+    <ClInclude Include="Source\Utilities.h" />
     <ClInclude Include="Utils\imgui\imconfig.h" />
     <ClInclude Include="Utils\imgui\imgui.h" />
     <ClInclude Include="Utils\imgui\imgui_internal.h" />
@@ -262,9 +302,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="HLSL\Debug.hlsli" />
+    <None Include="HLSL\FilterFunctions.hlsli" />
+    <None Include="HLSL\GaussianBlur.hlsli" />
     <None Include="HLSL\geometry_particle.hlsli" />
+    <None Include="HLSL\Glitch_Effect.hlsli" />
     <None Include="HLSL\ImGui.hlsli" />
     <None Include="HLSL\Line.hlsli" />
+    <None Include="HLSL\LuminanceExtraction.hlsli" />
+    <None Include="HLSL\math_utils.hlsli" />
     <None Include="HLSL\SkinnedMesh.hlsli" />
     <None Include="HLSL\Skymap.hlsli" />
     <None Include="HLSL\Sprite.hlsli" />
@@ -278,6 +323,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+    <FxCompile Include="HLSL\GaussianBlur_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\GaussianBlur_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="HLSL\geometry_particle_gs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Geometry</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
@@ -289,6 +346,18 @@
     <FxCompile Include="HLSL\geometry_particle_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\Glitch_Effect_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\Glitch_Effect_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\ImGuiPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
@@ -319,6 +388,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="HLSL\LineVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\LuminanceExtraction_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="HLSL\LuminanceExtraction_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>

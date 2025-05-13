@@ -118,9 +118,6 @@ protected:
 	//傾斜率(デフォルト = 1.0f)
 	float slopeRate = 1.0f;
 
-
-	//アニメーション
-
 	//アニメーション更新
 	void updateAnimation(float elapsedTime);
 	//アニメーション再生

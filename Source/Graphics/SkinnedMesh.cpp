@@ -1,13 +1,18 @@
+#define STB_IMAGE_IMPLEMENTATION // 実装を有効にする
+#include "stb_image.h"           // STB Image ヘッダーをインクルード
+
 #include "misc.h"
 #include "SkinnedMesh.h"
 #include <sstream>
 #include <functional>
-#include "shader.h"
+#include "ShaderManager.h"
 #include <filesystem>
 #include "texture.h"
 #include <fstream>
-#include<stdio.h>
-#include"Buffer.h"
+#include <stdio.h>
+#include "Buffer.h"
+#include <WICTextureLoader.h>
+
 
 using namespace DirectX;
 
@@ -77,6 +82,153 @@ void fetch_bone_influences(const FbxMesh* fbx_mesh,
 			}
 		}
 	}
+}
+
+void SkinnedMesh::BulidModel(ID3D11Device* device, const char* dirname)
+{
+	for(auto& material : materials)
+	{
+		//相対パスの解決
+		char filename[MAX_PATH];
+		::_makepath_s(filename, MAX_PATH, nullptr, dirname, material.second.texture_filenames->c_str(), nullptr);
+
+		// ディフューズマップテクスチャ読み込み
+		HRESULT hr = LoadTexture(device, filename, nullptr, true,material.second.shader_resource_views[0].GetAddressOf());
+		_ASSERT_EXPR(SUCCEEDED(hr), hrTrace(hr));
+
+		// ノーマルマップテクスチャ読み込み
+		LoadTexture(device, filename, "_N", true,  material.second.shader_resource_views[1].GetAddressOf(), 0xFFFF7F7F);
+	}
+
+	for (mesh& mesh : meshes)
+	{
+		//サブセット
+		for (mesh::subset& subset : mesh.subsets)
+		{
+			subset.material = &materials.at(subset.material_unique_id);
+		}
+
+		//頂点バッファ
+		{
+			D3D11_BUFFER_DESC bufferDesc = {};
+			D3D11_SUBRESOURCE_DATA subresourceData = {};
+
+			bufferDesc.ByteWidth = static_cast<UINT>(sizeof(vertex) * mesh.vertices.size());
+			bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+			bufferDesc.Usage = D3D11_USAGE_IMMUTABLE;
+			bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			bufferDesc.CPUAccessFlags = 0;
+			bufferDesc.MiscFlags = 0;
+			bufferDesc.StructureByteStride = 0;
+			subresourceData.pSysMem = mesh.vertices.data();
+			subresourceData.SysMemPitch = 0;
+			subresourceData.SysMemSlicePitch = 0;
+
+			HRESULT hr = device->CreateBuffer(&bufferDesc, &subresourceData, mesh.vertex_buffer.GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hrTrace(hr));
+		}
+	}
+}
+
+HRESULT SkinnedMesh::LoadTexture(ID3D11Device* device, const char* filename, const char* suffix, bool dummy, ID3D11ShaderResourceView** srv, UINT dummy_color )
+{
+	// パスを分解
+	char drive[256], dirname[256], fname[256], ext[256];
+	::_splitpath_s(filename, drive, sizeof(drive), dirname, sizeof(dirname), fname, sizeof(fname), ext, sizeof(ext));
+	// 末尾文字を追加
+	if (suffix != nullptr)
+	{
+		::strcat_s(fname, sizeof(fname), suffix);
+	}
+	// パスを結合
+	char filepath[256];
+	::_makepath_s(filepath, 256, drive, dirname, fname, ext);
+
+	// マルチバイト文字からワイド文字へ変換
+	wchar_t wfilepath[256];
+	::MultiByteToWideChar(CP_ACP, 0, filepath, -1, wfilepath, 256);
+
+	// テクスチャ読み込み
+	Microsoft::WRL::ComPtr<ID3D11Resource> resource;
+	HRESULT hr = DirectX::CreateWICTextureFromFile (device, wfilepath, resource.GetAddressOf(), srv);
+	if (FAILED(hr))
+	{
+		// WICでサポートされていないフォーマットの場合TGAなどは
+		// STBで画像読み込みをしてテクスチャを生成する
+		int width, height, bpp;
+		unsigned char* pixels = stbi_load(filepath, &width, &height, &bpp, STBI_rgb_alpha);
+		if (pixels != nullptr)
+		{
+			D3D11_TEXTURE2D_DESC desc = { 0 };
+			desc.Width = width;
+			desc.Height = height;
+			desc.MipLevels = 1;
+			desc.ArraySize = 1;
+			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.SampleDesc.Count = 1;
+			desc.SampleDesc.Quality = 0;
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			desc.CPUAccessFlags = 0;
+			desc.MiscFlags = 0;
+			D3D11_SUBRESOURCE_DATA data;
+			::memset(&data, 0, sizeof(data));
+			data.pSysMem = pixels;
+			data.SysMemPitch = width * 4;
+
+			Microsoft::WRL::ComPtr<ID3D11Texture2D>	texture;
+			hr = device->CreateTexture2D(&desc, &data, texture.GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hrTrace(hr));
+
+			hr = device->CreateShaderResourceView(texture.Get(), nullptr, srv);
+			_ASSERT_EXPR(SUCCEEDED(hr), hrTrace(hr));
+
+			// 後始末
+			stbi_image_free(pixels);
+		}
+		else if (this == nullptr)
+		{
+			// 読み込み失敗したらダミーテクスチャを作る
+			//LOG("load failed : %s\n", filepath);
+
+			const int width = 8;
+			const int height = 8;
+			UINT pixels[width * height];
+			for (int yy = 0; yy < height; ++yy)
+			{
+				for (int xx = 0; xx < width; ++xx)
+				{
+					pixels[yy * width + xx] = dummy_color;
+				}
+			}
+
+			D3D11_TEXTURE2D_DESC desc = { 0 };
+			desc.Width = width;
+			desc.Height = height;
+			desc.MipLevels = 1;
+			desc.ArraySize = 1;
+			desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.SampleDesc.Count = 1;
+			desc.SampleDesc.Quality = 0;
+			desc.Usage = D3D11_USAGE_DEFAULT;
+			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			desc.CPUAccessFlags = 0;
+			desc.MiscFlags = 0;
+			D3D11_SUBRESOURCE_DATA data;
+			::memset(&data, 0, sizeof(data));
+			data.pSysMem = pixels;
+			data.SysMemPitch = width;
+
+			Microsoft::WRL::ComPtr<ID3D11Texture2D>	texture;
+			hr = device->CreateTexture2D(&desc, &data, texture.GetAddressOf());
+			_ASSERT_EXPR(SUCCEEDED(hr), hrTrace(hr));
+
+			hr = device->CreateShaderResourceView(texture.Get(), nullptr, srv);
+			_ASSERT_EXPR(SUCCEEDED(hr), hrTrace(hr));
+		}
+	}
+	return hr;
+
 }
 
 SkinnedMesh::SkinnedMesh(ID3D11Device* device, const char* fbx_filename, bool triangulate)

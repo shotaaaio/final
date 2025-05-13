@@ -11,6 +11,7 @@
 #include "cereal/types/vector.hpp"
 #include "cereal/types/set.hpp"
 #include "cereal/types/unordered_map.hpp"
+
 namespace DirectX
 {
 	template<class T>
@@ -217,6 +218,27 @@ public:
 		}
 	};
 
+	struct material
+	{
+		uint64_t unique_id{ 0 };
+		std::string name;
+
+		DirectX::XMFLOAT4 Ka{ 0.2f, 0.2f, 0.2f, 1.0f };
+		DirectX::XMFLOAT4 Kd{ 0.8f, 0.8f, 0.8f, 1.0f };
+		DirectX::XMFLOAT4 Ks{ 1.0f, 1.0f, 1.0f, 1.0f };
+
+		std::string texture_filenames[4];
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_views[4];
+
+		template<class T>
+		void serialize(T& archive)
+		{
+			archive(unique_id, name, Ka, Kd, Ks, texture_filenames);
+		}
+	};
+
+	std::unordered_map<uint64_t, material> materials;
+
 	struct mesh
 	{
 		uint64_t unique_id{ 0 };
@@ -236,6 +258,8 @@ public:
 
 			uint32_t start_index_location{ 0 };
 			uint32_t index_count{ 0 };
+
+			material* material = nullptr;
 
 			template<class T>
 			void serialize(T& archive)
@@ -268,27 +292,12 @@ public:
 	};
 	std::vector<mesh> meshes;
 
-	struct material
-	{
-		uint64_t unique_id{ 0 };
-		std::string name;
-
-		DirectX::XMFLOAT4 Ka{ 0.2f, 0.2f, 0.2f, 1.0f };
-		DirectX::XMFLOAT4 Kd{ 0.8f, 0.8f, 0.8f, 1.0f };
-		DirectX::XMFLOAT4 Ks{ 1.0f, 1.0f, 1.0f, 1.0f };
-
-		std::string texture_filenames[4];
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shader_resource_views[4];
-
-		template<class T>
-		void serialize(T& archive)
-		{
-			archive(unique_id, name, Ka, Kd, Ks, texture_filenames);
-		}
-	};
+	//モデル構築
+	void BulidModel(ID3D11Device* device,const char* dirname);
 
 
-	std::unordered_map<uint64_t, material> materials;
+	//テクスチャ読み込み
+	HRESULT LoadTexture(ID3D11Device* device, const char* filename, const char* suffix, bool dummy, ID3D11ShaderResourceView** srv, UINT dummy_color = 0xFFFFFFFF);
 
 private:
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> vertex_shader;

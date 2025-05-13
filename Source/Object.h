@@ -1,12 +1,13 @@
 #pragma once
 #include<DirectXMath.h>
 #include"Graphics/SkinnedMesh.h"
+#include "Graphics/Sprite.h"
 
 class Object
 {
 public:
-	Object(){}
-	virtual ~Object(){}
+	Object() {}
+	virtual ~Object() {}
 
 	//行列更新処理
 	virtual void updateTransform();
@@ -41,4 +42,8 @@ protected:
 
 	//モデル
 	std::unique_ptr<SkinnedMesh>model;
+
+	std::unique_ptr<Sprite> shizukuImage;
+
+	std::unique_ptr<Sprite> wakuImage;
 };

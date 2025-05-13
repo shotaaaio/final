@@ -46,6 +46,15 @@ public:
 	float getTextureWidth() { return static_cast<float>(texture2d_desc.Width); }
 	float getTextureHeight() { return static_cast<float>(texture2d_desc.Height); }
 
+	// 頂点バッファの取得
+	const Microsoft::WRL::ComPtr<ID3D11Buffer>& GetVertexBuffer() const { return vertex_buffer; }
+
+	// シェーダーリソースビューの取得
+	const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& GetShaderResourceView() const { return shader_resource_view; }
+
+	// シェーダーリソースビューの設定
+	void SetShaderResourceView(const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int texWidth, int texHeight);
+
 private:
 	static void rotate(float& x, float& y, float cx, float cy, float angle)
 	{
@@ -61,4 +70,8 @@ private:
 		x += cx;
 		y += cy;
 	};
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>	shaderResourceView;
+
+	int textureWidth = 0;
+	int textureHeight = 0;
 };

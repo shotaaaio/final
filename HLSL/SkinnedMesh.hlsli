@@ -13,6 +13,8 @@ struct VS_OUT
 	float4 position : SV_POSITION;
 	float2 texcoord : TEXCOORD;
     float4 world_normal : NORMAL;
+    float4 tangent : TANGENT;
+    float3 binormal : BINORMAL;
 	float4 color : COLOR;
 };
 

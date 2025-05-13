@@ -10,6 +10,8 @@
 #include"StraightBullet.h"
 #include"HomingBullet.h"
 #include"Mathf.h"
+#include "ObjManager.h"
+#include "Graphics/Sprite.h"
 
 //コンストラクタ
 Player::Player()
@@ -29,8 +31,8 @@ Player::Player()
 	boneIndex = model->findBoneIndex("NIC:wand2_BK",meshIndex);
 
 	//それぞれのボタン入力の行動を設定
-	Key_c = std::bind(&Player::FlyingStraightBullet,this);
-	Key_v = std::bind(&Player::FlyingHomingBullet,this);
+	//Key_c = std::bind(&Player::FlyingStraightBullet,this);
+	//Key_v = std::bind(&Player::FlyingHomingBullet,this);
 	Key_z = std::bind(&Player::JumpAction, this);
 	Key_x = std::bind(&Player::Attack, this);
 }
@@ -43,6 +45,11 @@ Player::~Player()
 //更新処理
 void Player::update(float elapsedTime)
 {
+	if (!move_b) {
+		updateTransform();
+		return;
+	}
+
 	if (!isPlayAnimation())
 	{
 		playAnimation(0, true);
@@ -58,13 +65,13 @@ void Player::update(float elapsedTime)
 	updateVelocity(elapsedTime);
 
 	//弾更新処理
-	bulletMgr.update(elapsedTime);
+	//bulletMgr.update(elapsedTime);
 
 	//プレイヤーと敵との衝突処置
 	collisionPlayerAndEnemies();
 
 	//敵と弾の衝突判定
-	collisionBulletAndEnemies();
+	//collisionBulletAndEnemies();
 
 	//アニメーションの更新
 	updateAnimation(elapsedTime);
@@ -81,14 +88,12 @@ void Player::render(ID3D11DeviceContext* dc)
 	model->render(dc, transform, { 1.0f,1.0f,1.0f,1.0f }, &keyframe);
 
 	//弾描画処理
-	bulletMgr.render(dc);
+	//bulletMgr.render(dc);
 }
 
 //デバック用の描画
 void Player::drawDebugGui()
 {
-	ImGui::Begin("Player");
-
 	//位置
 	ImGui::InputFloat3("Position", &position.x);
 
@@ -105,7 +110,7 @@ void Player::drawDebugGui()
 
 	ImGui::InputFloat3("lod pos", &bonePosition.x);
 
-	ImGui::End();
+	
 }
 
 void Player::drawDrawPrimitive()
@@ -117,14 +122,13 @@ void Player::drawDrawPrimitive()
 	debugRenderer->drawCylinder(position, radius, height, { 0,0,0,1 });
 
 	//弾デバックプリミティブ描画
-	bulletMgr.drawDebugPrimitive();
+	//bulletMgr.drawDebugPrimitive();
 
 	debugRenderer->drawSphere(
 		bonePosition,
 		1.0f,
 		DirectX::XMFLOAT4(1, 0, 0, 1)
 	);
-
 }
 
 //入力値から移動ベクトルを取得
@@ -175,14 +179,21 @@ DirectX::XMFLOAT3 Player::getMoveVec()const
 
 void Player::InputMove(float elapsedTime)
 {
-	//進行ベクトル取得
-	DirectX::XMFLOAT3 moveVec = getMoveVec();
+	if (!isOnLadder)
+	{
+		//進行ベクトル取得
+		DirectX::XMFLOAT3 moveVec = getMoveVec();
 
-	//移動処理
-	Move(moveVec.x, moveVec.z, moveSpeed);
+		//移動処理
+		Move(moveVec.x, moveVec.z, moveSpeed);
 
-	//旋回処理
-	turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+		//旋回処理
+		turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
+	}
+	else
+	{
+		Move(0, 0, 0);
+	}
 }
 
 //プレイヤーと敵との衝突判定
@@ -210,10 +221,25 @@ void Player::collisionPlayerAndEnemies()
 			outVec
 		))
 		{
-			float closs = (position.y * (enemy->getPosition()->z)) - (position.z * (enemy->getPosition()->y));
-			if (closs > 0.0f)
+			// プレイヤーの下端の高さ
+			float playerBottom = position.y;
+			float enemyTop = enemy->getPosition()->y + enemy->getHeight() * 0.5f;
+
+			float verticalVelocity = velocity.y; // プレイヤーのY方向速度が必要（下に落ちてきてるか）
+
+			// 踏みつけと判定する条件
+			if (playerBottom > enemyTop && verticalVelocity < -0.1f)
 			{
 				jump(jumpSpeed * 0.5f);
+				attack_count++;
+
+				int damage = 2; // 仮のダメージとして１
+				if (InputManager::instance()->attack)
+				{
+					if (enemy->applyDamage(damage, 0.1f))
+					{
+					}
+				}
 			}
 			else
 			{
@@ -235,57 +261,57 @@ void Player::collisionPlayerAndEnemies()
 		}
 	}
 }
-
-void Player::collisionBulletAndEnemies()
-{
-	EnemyManager* enemyMgr = EnemyManager::instance();
-
-	//全ての弾と全ての敵を総当たりで衝突処理
-	int bulletCount = bulletMgr.getBulletCount();
-	int enemyCount = enemyMgr->getEnemyCount();
-
-	for (int i = 0;i < bulletCount;++i)
-	{
-		Bullet* bullet = bulletMgr.getBullet(i);
-		for (int j = 0;j < enemyCount;++j)
-		{
-			Enemy* enemy = EnemyManager::instance()->getEnemy(j);
-
-			//衝突処理
-			DirectX::XMFLOAT3 outVec;
-			if (Collision::intersectSphereAndCylinder(
-				*bullet->getPosition(),
-				bullet->getRadius(),
-				*enemy->getPosition(),
-				enemy->getRadius(),
-				enemy->getHeight(),
-				outVec
-			))
-			{
-				//仮のダメージ
-				int damage = 3;
-				if (enemy->applyDamage(damage,0.1f))
-				{
-					//吹き飛ばし
-					float power = 10.0f;
-					DirectX::XMFLOAT3 impulse;
-					impulse.x = outVec.x * power;
-					impulse.y = power * 0.5f;
-					impulse.z = outVec.z * power;
-					enemy->addImpulse(impulse);
-
-					//ヒットエフェクトの再生
-					DirectX::XMFLOAT3 enePos = *enemy->getPosition();
-					enePos.y += enemy->getHeight() * 0.5f;
-					Effekseer::Handle handle = hitEffect->play(&enePos, 0.5f);
-
-					//弾の破棄
-					bullet->destroy();
-				}
-			}
-		}
-	}
-}
+//
+//void Player::collisionBulletAndEnemies()
+//{
+//	EnemyManager* enemyMgr = EnemyManager::instance();
+//
+//	//全ての弾と全ての敵を総当たりで衝突処理
+//	int bulletCount = bulletMgr.getBulletCount();
+//	int enemyCount = enemyMgr->getEnemyCount();
+//
+//	for (int i = 0;i < bulletCount;++i)
+//	{
+//		Bullet* bullet = bulletMgr.getBullet(i);
+//		for (int j = 0;j < enemyCount;++j)
+//		{
+//			Enemy* enemy = EnemyManager::instance()->getEnemy(j);
+//
+//			//衝突処理
+//			DirectX::XMFLOAT3 outVec;
+//			if (Collision::intersectSphereAndCylinder(
+//				*bullet->getPosition(),
+//				bullet->getRadius(),
+//				*enemy->getPosition(),
+//				enemy->getRadius(),
+//				enemy->getHeight(),
+//				outVec
+//			))
+//			{
+//				//仮のダメージ
+//				int damage = 3;
+//				if (enemy->applyDamage(damage,0.1f))
+//				{
+//					//吹き飛ばし
+//					float power = 10.0f;
+//					DirectX::XMFLOAT3 impulse;
+//					impulse.x = outVec.x * power;
+//					impulse.y = power * 0.5f;
+//					impulse.z = outVec.z * power;
+//					enemy->addImpulse(impulse);
+//
+//					//ヒットエフェクトの再生
+//					DirectX::XMFLOAT3 enePos = *enemy->getPosition();
+//					enePos.y += enemy->getHeight() * 0.5f;
+//					Effekseer::Handle handle = hitEffect->play(&enePos, 0.5f);
+//
+//					//弾の破棄
+//					bullet->destroy();
+//				}
+//			}
+//		}
+//	}
+//}
 
 //行動受付
 void Player::inputAction()
@@ -310,54 +336,54 @@ void Player::Attack()
 	playAnimation(7, false);
 }
 
-
-void Player::FlyingStraightBullet()
-{
-	//前方向
-	DirectX::XMFLOAT3 dir = Mathf::GetForwardDirection(angle.y);
-
-	//発射位置(プレイヤーの腰あたり)
-	DirectX::XMFLOAT3 pos;
-	pos.x = position.x;
-	pos.y = position.y + height * 0.5f;
-	pos.z = position.z;
-
-	//発射
-	StraightBullet* bullet = new StraightBullet(&bulletMgr);
-	bullet->setDirection(dir);
-	bullet->setPosition(pos);
-}
-
-void Player::FlyingHomingBullet()
-{
-	//前方向
-	DirectX::XMFLOAT3 dir = Mathf::GetForwardDirection(angle.y);
-
-	//発射位置(プレイヤーの腰あたり)
-	DirectX::XMFLOAT3 pos;
-	pos.x = position.x;
-	pos.y = position.y + height * 0.5f;
-	pos.z = position.z;
-
-	//ターゲット
-	DirectX::XMFLOAT3 target;
-	target.x = pos.x + dir.x * 1000.0f;
-	target.y = pos.y + dir.y * 1000.0f;
-	target.z = pos.z + dir.z * 1000.0f;
-
-	//一番近くの敵をターゲットに設定
-	Enemy* enemy = EnemyManager::instance()->searchEnemy(&pos);
-	if (enemy != nullptr)
-	{
-		target = *enemy->getPosition();
-		target.y += enemy->getHeight() * 0.5f;
-	}
-	//発射
-	HomingBullet* bullet = new HomingBullet(&bulletMgr);
-	bullet->setDirection(dir);
-	bullet->setPosition(pos);
-	bullet->lockOnTarget(target);
-}
+//
+//void Player::FlyingStraightBullet()
+//{
+//	//前方向
+//	DirectX::XMFLOAT3 dir = Mathf::GetForwardDirection(angle.y);
+//
+//	//発射位置(プレイヤーの腰あたり)
+//	DirectX::XMFLOAT3 pos;
+//	pos.x = position.x;
+//	pos.y = position.y + height * 0.5f;
+//	pos.z = position.z;
+//
+//	//発射
+//	StraightBullet* bullet = new StraightBullet(&bulletMgr);
+//	bullet->setDirection(dir);
+//	bullet->setPosition(pos);
+//}
+//
+//void Player::FlyingHomingBullet()
+//{
+//	//前方向
+//	DirectX::XMFLOAT3 dir = Mathf::GetForwardDirection(angle.y);
+//
+//	//発射位置(プレイヤーの腰あたり)
+//	DirectX::XMFLOAT3 pos;
+//	pos.x = position.x;
+//	pos.y = position.y + height * 0.5f;
+//	pos.z = position.z;
+//
+//	//ターゲット
+//	DirectX::XMFLOAT3 target;
+//	target.x = pos.x + dir.x * 1000.0f;
+//	target.y = pos.y + dir.y * 1000.0f;
+//	target.z = pos.z + dir.z * 1000.0f;
+//
+//	//一番近くの敵をターゲットに設定
+//	Enemy* enemy = EnemyManager::instance()->searchEnemy(&pos);
+//	if (enemy != nullptr)
+//	{
+//		target = *enemy->getPosition();
+//		target.y += enemy->getHeight() * 0.5f;
+//	}
+//	//発射
+//	HomingBullet* bullet = new HomingBullet(&bulletMgr);
+//	bullet->setDirection(dir);
+//	bullet->setPosition(pos);
+//	bullet->lockOnTarget(target);
+//}
 
 void Player::onLanding()
 {

@@ -1,7 +1,7 @@
 #include"Skymap.h"
 #include"Texture.h"
 #include"misc.h"
-#include"Shader.h"
+#include"ShaderManager.h"
 #include"Framework.h"
 #include"Buffer.h"
 

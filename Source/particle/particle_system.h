@@ -7,7 +7,7 @@
 #include<vector>
 
 #include"./Graphics/Texture.h"
-#include"./Graphics/Shader.h"
+#include"./Graphics/ShaderManager.h"
 
 class ParticleSystem
 {

@@ -34,20 +34,6 @@ void GameScene::initialize()
 	//カメラ操作の初期化
 	cameraCtrl = std::make_unique<CameraController>();
 
-	//敵の作成と初期化
-	//for (int i = 0;i < 2;++i)
-	//{
-	//	EnemySlime* slime = new EnemySlime();
-	//	slime->setPosition({ i*2.0f,0.0f,5.0f });
-
-	//	//敵管理クラスに取り付け
-	//	EnemyManager* eneMgr = EnemyManager::instance();
-	//	eneMgr->regist(slime);
-	//}
-
-	//ゲージ用スプライト
-	//gauge = std::make_unique<Sprite>(deviceMgr->getDevice(), nullptr);
-	
 	//カメラ初期設定
 	Camera* camera = Camera::instance();
 	camera->setLookAt(
@@ -276,6 +262,7 @@ void GameScene::render()
 		player->drawDrawPrimitive();
 
 		EnemyManager::instance()->drawDebugPrimitive();
+		EnemyManager::instance()->drawImgui();
 	}
 
 	// 2D 描画設定

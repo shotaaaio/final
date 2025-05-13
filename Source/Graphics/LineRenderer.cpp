@@ -1,6 +1,6 @@
 #include "LineRenderer.h"
 #include "misc.h"
-#include "Shader.h"
+#include "ShaderManager.h"
 
 #include <stdio.h>
 #include <memory>

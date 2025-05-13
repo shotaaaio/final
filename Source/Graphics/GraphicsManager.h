@@ -1,14 +1,11 @@
-#pragma once
+﻿#pragma once
 
-#include <d3d11.h>
-#include <wrl.h>
 #include <functional>
 #include <memory>
-
 #include "DebugRenderer.h"
 #include "LineRenderer.h"
 #include "Buffer.h"
-
+#include "Shader.h"
 enum class SAMPLER_STATE
 {
 	POINT,
@@ -18,10 +15,10 @@ enum class SAMPLER_STATE
 
 enum class DEPTH_STENCIL_STATE
 {
-	ON_ON,		// �[�x�e�X�g�� ON �[�x�������݂� ON
-	ON_OFF,		// �[�x�e�X�g�� ON �[�x�������݂� OFF
-	OFF_ON,		// �[�x�e�X�g�� OFF �[�x�������݂� ON
-	OFF_OFF,	// �[�x�e�X�g�� OFF �[�x�������݂� OFF
+	ON_ON,		// 深度テストを ON 深度書き込みを ON
+	ON_OFF,		// 深度テストを ON 深度書き込みを OFF
+	OFF_ON,		// 深度テストを OFF 深度書き込みを ON
+	OFF_OFF,	// 深度テストを OFF 深度書き込みを OFF
 };
 
 enum class BLEND_STATE
@@ -40,17 +37,83 @@ enum class RASTERIZER_STATE
 	WIRE_CULLNONE
 };
 
-// �����_�[�R���e�L�X�g
+//ガウスフィルター
+struct GaussianFilterData
+{
+	int kernelSize = 8;           //カーネルサイズ
+	float deviation = 10.0f;      //標準偏差
+	DirectX::XMFLOAT2 textureSize;//暈すテクスチャサイズ
+};
+static const int MaxKernelSize = 16;//ガウスフィルタの最大カーネル数
+
+//高輝度抽出用情報
+struct LumianceExtractionData
+{
+	float threshold = 0.5f;
+	float intensity = 1.0f;//ブルームの強度
+	DirectX::XMFLOAT2 dummy;
+};
+
+//グリッチ情報
+struct GlitchData
+{
+	  float time;                // 経過時間
+    float density;             // 密度
+    float shift;               // ずらす幅
+    float line_impact;         // 一本線の影響度
+
+    DirectX::XMFLOAT2 x_shift;   // xの横をどの程度ずらすのか
+    DirectX::XMFLOAT2 y_shift;   // yの横をどの程度ずらすのか
+
+    float rand_float;          // ランダム性
+    float x_shifting;          // 色収差のxの位置をずらす
+    float y_shifting;          // 色収差のyの位置をずらす    
+    float extension;           // uvの拡張
+
+    float uv_slider;           // 左上に流す
+    float brightness;          // 明るさ
+    float glitch_mask_radius;  // マスク半径
+    int glitch_sampling_count; // 回数
+
+    DirectX::XMFLOAT2 center = { 0.5f, 0.5f };    // 中心
+    float gage = 0.0f;
+
+    float rect_noise_width;    // ズ矩形の幅（UV空間）
+    float rect_noise_height;   // ズ矩形の高さ（UV空間）
+    float rect_noise_strength; // ズ強度（0〜1）
+
+    float flash_frequency;     // フラッシュ周期（秒）
+    float flash_strength;      // フラッシュ反転割合（0〜1）
+};
+
+enum class SpriteShaderID
+{
+	Default,
+	Glitch,
+	GaussianBlur,
+	ColorGrading,
+	LuminanceExtraction,
+	Max
+};
+
+// レンダーコンテキスト
 struct RenderContext
 {
-	// �T���v���[�X�e�[�g
+	// サンプラーステート
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStates[3];
-	// �[�x�X�e���V���X�e�[�g
+	// 深度ステンシルステート
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilStates[4];
-	// �u�����h�X�e�[�g
+	// ブレンドステート
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];
-	// ���X�^���C�U�X�e�[�g
+	// ラスタライザステート
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[4];
+
+	GlitchData glitchData;
+
+	GaussianFilterData gaussianFilterData;
+
+	LumianceExtractionData luminanceExtractionData;
+
 };
 
 class GraphicsManager
@@ -68,6 +131,8 @@ public:
 
 	bool initialize(ID3D11Device* device, ID3D11DeviceContext* dc);
 
+	ID3D11Device* GetDevice() const { return device.Get(); }
+
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> getSamplerState(SAMPLER_STATE state) const { return renderContext.samplerStates[static_cast<int>(state)]; }
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> getDepthStencilStates(DEPTH_STENCIL_STATE state) const { return renderContext.depthStencilStates[static_cast<int>(state)]; }
@@ -76,17 +141,32 @@ public:
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> getRasterizerStates(RASTERIZER_STATE state) const { return renderContext.rasterizerStates[static_cast<int>(state)]; }
 
+	// スクリーン幅取得
+	float GetScreenWidth() const { return screenWidth; }
+
+	// スクリーン高さ取得
+	float GetScreenHeight() const { return screenHeight; }
+
 	void SettingRenderContext(void(*settingCallback)(ID3D11DeviceContext*, RenderContext*));
 
 	DebugRenderer* getDebugRenderer() const { return debugRenderer.get(); }
 
 	LineRenderer* getLineRenderer() const { return lineRenderer.get(); }
 
+	// スプライトシェーダー取得
+	SpriteShader* GetShader(SpriteShaderID id) const { return spriteShaders[static_cast<int>(id)].get(); }
+
 private:
 	ID3D11DeviceContext* deviceContext = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Device> device;
 	RenderContext renderContext;
 	
+	std::unique_ptr<SpriteShader>	spriteShaders[static_cast<int>(SpriteShaderID::Max)];
+
 	std::unique_ptr<DebugRenderer> debugRenderer;
 	std::unique_ptr<LineRenderer> lineRenderer;
+
+	float	screenWidth;
+	float	screenHeight;
 
 };

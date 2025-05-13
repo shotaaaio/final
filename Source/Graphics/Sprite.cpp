@@ -1,7 +1,7 @@
 #include "Sprite.h"
 #include "misc.h"
 #include "Texture.h"
-#include "Shader.h"
+#include "ShaderManager.h"
 
 /// <summary>
 /// コンストラクタ
@@ -220,4 +220,11 @@ void Sprite::render(ID3D11DeviceContext* immediate_context, float dx, float dy, 
 		1.0f, 1.0f, 1.0f, 1.0f,
 		0.0f,
 		0.0f, 0.0f, static_cast<float>(texture2d_desc.Width), static_cast<float>(texture2d_desc.Height));
+}
+// シェーダーリソースビューの設定
+void Sprite::SetShaderResourceView(const Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& srv, int texWidth, int texHeight)
+{
+	shaderResourceView = srv;
+	textureWidth = texWidth;
+	textureHeight = texHeight;
 }

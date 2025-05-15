@@ -44,14 +44,16 @@ private:
 
 	void Reset();
 
+	//ゲージをクリックで動かす
 	void clickMoveGauge(Enemy* enemy,
 		float gaugeWidth,
 		float gaugeHeight,
 		float& gaugeOffsetX,
 		float& gaugeOffsetY,
-		bool& isDragging,
-		Enemy*& selectedEnemy,
-		int enemyIndex);
+		int enemyIndex,
+		ID3D11DeviceContext* dc,
+		const DirectX::XMFLOAT4X4& view,
+		const DirectX::XMFLOAT4X4& projection);
 private:
 	// シーン定数
 	struct SceneConstants

@@ -340,10 +340,61 @@ void StageTuta::RenderEnemyGauge(
 	const DirectX::XMFLOAT4X4& view,
 	const DirectX::XMFLOAT4X4& projection)
 {
+
+	// 敵マネージャー取得
+	EnemyManager* enemyMgr = EnemyManager::instance();
+	int enemyCount = enemyMgr->getEnemyCount();
+
+	for (int i = 0; i < enemyCount; ++i)
+	{
+		Enemy* enemy = enemyMgr->getEnemy(i);
+
+		// ゲージの長さ
+		const float gaugeWidth = 30.0f;
+		const float gaugeHeight = 5.0f;
+
+		float healthRate = enemy->getHealth() / static_cast<float>(enemy->getMaxHealth());
+
+		float& gaugeOffsetX = gaugeOffsets[enemy].x;
+		float& gaugeOffsetY = gaugeOffsets[enemy].y;
+
+		clickMoveGauge(enemy, gaugeWidth, gaugeHeight, gaugeOffsetX, gaugeOffsetY, i, dc, view, projection);
+
+		ImGui::Begin("gauge");
+		ImGui::SliderFloat3("gp", &gaugeOffsetX, -5.0f, 5.0f);
+		ImGui::End();
+
+		// ゲージ描画
+		gauge->render(
+			dc,
+			gaugeOffsetX, gaugeOffsetY,
+			gaugeWidth * healthRate, gaugeHeight,
+			1.0f, 0.0f, 0.0f, 1.0f,
+			0.0f,
+			0, 0,
+			static_cast<float>(gauge->getTextureWidth()),
+			static_cast<float>(gauge->getTextureHeight())
+		);
+	}
+
+}
+
+
+void StageTuta::clickMoveGauge(Enemy* enemy,
+	float gaugeWidth,
+	float gaugeHeight,
+	float& gaugeOffsetX,
+	float& gaugeOffsetY,
+	int enemyIndex,
+	ID3D11DeviceContext* dc,
+	const DirectX::XMFLOAT4X4& view,
+	const DirectX::XMFLOAT4X4& projection)
+{
 	// ビューポート取得
 	D3D11_VIEWPORT viewport;
 	UINT numViewports = 1;
 	dc->RSGetViewports(&numViewports, &viewport);
+
 
 	// 変換行列
 	DirectX::XMMATRIX viewMat = DirectX::XMLoadFloat4x4(&view);
@@ -355,119 +406,29 @@ void StageTuta::RenderEnemyGauge(
 	static Enemy* selectedEnemy = nullptr;
 	static bool isDragging = false;
 
-	// 敵マネージャー取得
-	EnemyManager* enemyMgr = EnemyManager::instance();
-	int enemyCount = enemyMgr->getEnemyCount();
+	// エネミーの頭上のワールド座標
+	DirectX::XMFLOAT3 worldPosition = *enemy->getPosition();
+	worldPosition.y += enemy->getHeight();
 
-	for (int i = 0; i < enemyCount; ++i)
+	DirectX::XMVECTOR worldPositionVec = DirectX::XMLoadFloat3(&worldPosition);
+
+	// ワールド座標からスクリーン座標へ変換
+	DirectX::XMVECTOR screenPositionVec = DirectX::XMVector3Project(
+		worldPositionVec,
+		viewport.TopLeftX, viewport.TopLeftY,
+		viewport.Width, viewport.Height,
+		viewport.MinDepth, viewport.MaxDepth,
+		projMat, viewMat, worldMat
+	);
+
+	// スクリーン座標取得
+	DirectX::XMFLOAT2 screenPosition;
+	DirectX::XMStoreFloat2(&screenPosition, screenPositionVec);
+
+	if (!clickGauge[enemyIndex])
 	{
-		Enemy* enemy = enemyMgr->getEnemy(i);
-
-		// エネミーの頭上のワールド座標
-		DirectX::XMFLOAT3 worldPosition = *enemy->getPosition();
-		worldPosition.y += enemy->getHeight();
-
-		DirectX::XMVECTOR worldPositionVec = DirectX::XMLoadFloat3(&worldPosition);
-
-		// ワールド座標からスクリーン座標へ変換
-		DirectX::XMVECTOR screenPositionVec = DirectX::XMVector3Project(
-			worldPositionVec,
-			viewport.TopLeftX, viewport.TopLeftY,
-			viewport.Width, viewport.Height,
-			viewport.MinDepth, viewport.MaxDepth,
-			projMat, viewMat, worldMat
-		);
-
-		// スクリーン座標取得
-		DirectX::XMFLOAT2 screenPosition;
-		DirectX::XMStoreFloat2(&screenPosition, screenPositionVec);
-
-		// ゲージの長さ
-		const float gaugeWidth = 30.0f;
-		const float gaugeHeight = 5.0f;
-
-		float healthRate = enemy->getHealth() / static_cast<float>(enemy->getMaxHealth());
-
-		if (!clickGauge[i])
-		{
-			gaugeOffsets[enemy] = { screenPosition.x - gaugeWidth * 0.5f, screenPosition.y - gaugeHeight };
-		}
-
-		float gaugeOffsetX;
-		float gaugeOffsetY;
-		clickMoveGauge(enemy,gaugeWidth,gaugeHeight,gaugeOffsetX,gaugeOffsetY,isDragging,selectedEnemy,enemyi)
-
-		//float& gaugeOffsetX = gaugeOffsets[enemy].x;
-		//float& gaugeOffsetY = gaugeOffsets[enemy].y;
-
-		//// マウス選択処理
-		//if (mouse->getButtonDown() & Mouse::BTN_LEFT)
-		//{
-		//	float mouseX = static_cast<float>(mouse->getPositionX());
-		//	float mouseY = static_cast<float>(mouse->getPositionY());
-
-		//	// マウスがゲージの範囲内にあるかチェック
-		//	if (mouseX >= gaugeOffsetX && mouseX <= gaugeOffsetX + gaugeWidth &&
-		//		mouseY >= gaugeOffsetY && mouseY <= gaugeOffsetY + gaugeHeight)
-		//	{
-		//		selectedEnemy = enemy;
-		//		isDragging = true;
-		//	}
-		//}
-
-		//// ドラッグ中に位置更新
-		//if (isDragging && selectedEnemy == enemy && (mouse->getButton() & Mouse::BTN_LEFT))
-		//{
-		//	gaugeOffsetX = static_cast<float>(mouse->getPositionX()) - gaugeWidth * 0.5f;
-		//	gaugeOffsetY = static_cast<float>(mouse->getPositionY()) - gaugeHeight;
-		//	clickGauge[i] = true;
-		//}
-
-		//// マウスボタンを離したらドロップ
-		//if (isDragging && selectedEnemy == enemy && !(mouse->getButton() & Mouse::BTN_LEFT))
-		//{
-		//	isDragging = false;
-
-		//	
-		//	
-		//
-		//	if (gaugeOffsetX + gaugeWidth < 0 || gaugeOffsetX>1280 || gaugeOffsetY + gaugeHeight < 0 || gaugeOffsetY>720)
-		//	{
-		//		InputManager::instance()->attack = false;
-		//	}
-		//	selectedEnemy = nullptr;
-		//}
-		ImGui::Begin("gauge");
-		ImGui::SliderFloat3("gp", &gaugeOffsetX, -5.0f, 5.0f);
-		ImGui::End();
-
-			// ゲージ描画
-			gauge->render(
-				dc,
-				gaugeOffsetX, gaugeOffsetY,
-				gaugeWidth * healthRate, gaugeHeight,
-				1.0f, 0.0f, 0.0f, 1.0f,
-				0.0f,
-				0, 0,
-				static_cast<float>(gauge->getTextureWidth()),
-				static_cast<float>(gauge->getTextureHeight())
-			);
+		gaugeOffsets[enemy] = { screenPosition.x - gaugeWidth * 0.5f, screenPosition.y - gaugeHeight };
 	}
-}
-
-void StageTuta::clickMoveGauge(Enemy* enemy,
-	float gaugeWidth,
-	float gaugeHeight,
-	float& gaugeOffsetX,
-	float& gaugeOffsetY,
-	bool& isDragging,
-	Enemy*& selectedEnemy,
-	int enemyIndex)
-{
-	
-
-	float& gaugeOffsetX = gaugeOffsets[enemy].x;
-	float& gaugeOffsetY = gaugeOffsets[enemy].y;
 
 	// マウス選択処理
 	if (mouse->getButtonDown() & Mouse::BTN_LEFT)
@@ -489,7 +450,7 @@ void StageTuta::clickMoveGauge(Enemy* enemy,
 	{
 		gaugeOffsetX = static_cast<float>(mouse->getPositionX()) - gaugeWidth * 0.5f;
 		gaugeOffsetY = static_cast<float>(mouse->getPositionY()) - gaugeHeight;
-		clickGauge[i] = true;
+		clickGauge[enemyIndex] = true;
 	}
 
 	// マウスボタンを離したらドロップ
@@ -511,122 +472,7 @@ void StageTuta::clickMoveGauge(Enemy* enemy,
 //タッチによる敵の配置
 void StageTuta::enemyPlacementByTouch(ID3D11DeviceContext* dc, float elapsedTime)
 {
-	static Enemy* selectedEnemy = nullptr;
-	static bool isDragging = false;
-
-	Camera* camera = Camera::instance();
-	const DirectX::XMFLOAT4X4* view = camera->getView();
-	const DirectX::XMFLOAT4X4* proj = camera->getProjection();
-
-	D3D11_VIEWPORT viewport;
-	UINT numViewports = 1;
-	dc->RSGetViewports(&numViewports, &viewport);
-
-	DirectX::XMMATRIX viewMat = DirectX::XMLoadFloat4x4(view);
-	DirectX::XMMATRIX projMat = DirectX::XMLoadFloat4x4(proj);
-	DirectX::XMMATRIX worldMat = DirectX::XMMatrixIdentity();
-
-	Mouse* mouse = InputManager::instance()->getMouse();
-	/*const float doubleClickThreshold = 0.3f;
-	if (click) lastClickTime += elapsedTime;
-	if (lastClickTime > doubleClickThreshold)
-	{
-		click = !click;
-		lastClickTime = 0.0f;
-	}*/
-
-	// --- 敵選択処理 ---
-	if (mouse->getButtonDown() & Mouse::BTN_LEFT)
-	{
-		/*click = !click;
-		if (click) return;
-		if (lastClickTime > doubleClickThreshold)
-		{
-			lastClickTime = 0.0f;
-			return;
-		}
-		lastClickTime = 0.0f;*/
-		DirectX::XMFLOAT3 screenPosition{
-			static_cast<float>(mouse->getPositionX()),
-			static_cast<float>(mouse->getPositionY()),
-			0.0f
-		};
-
-		DirectX::XMVECTOR screenPositionVec = DirectX::XMLoadFloat3(&screenPosition);
-		DirectX::XMVECTOR worldPositionVec = DirectX::XMVector3Unproject(
-			screenPositionVec, viewport.TopLeftX, viewport.TopLeftY,
-			viewport.Width, viewport.Height, viewport.MinDepth, viewport.MaxDepth,
-			projMat, viewMat, worldMat
-		);
-
-		DirectX::XMFLOAT3 rayStart;
-		DirectX::XMStoreFloat3(&rayStart, worldPositionVec);
-
-		screenPosition.z = 1.0f;
-		screenPositionVec = DirectX::XMLoadFloat3(&screenPosition);
-		worldPositionVec = DirectX::XMVector3Unproject(
-			screenPositionVec, viewport.TopLeftX, viewport.TopLeftY,
-			viewport.Width, viewport.Height, viewport.MinDepth, viewport.MaxDepth,
-			projMat, viewMat, worldMat
-		);
-
-		DirectX::XMFLOAT3 rayEnd;
-		DirectX::XMStoreFloat3(&rayEnd, worldPositionVec);
-
-		if (!isDragging)
-		{
-			selectedEnemy = EnemyManager::instance()->getEnemyByRay(rayStart, rayEnd);
-			if (selectedEnemy)
-			{
-				isDragging = true;
-			}
-		}
-	}
-
-	// --- ドラッグ中の敵の位置を更新 ---
-	if (isDragging && selectedEnemy && mouse->getButton() & Mouse::BTN_LEFT)
-	{
-		DirectX::XMFLOAT3 screenPosition{
-			static_cast<float>(mouse->getPositionX()),
-			static_cast<float>(mouse->getPositionY()),
-			0.0f
-		};
-
-		DirectX::XMVECTOR screenPositionVec = DirectX::XMLoadFloat3(&screenPosition);
-		DirectX::XMVECTOR worldPositionVec = DirectX::XMVector3Unproject(
-			screenPositionVec, viewport.TopLeftX, viewport.TopLeftY,
-			viewport.Width, viewport.Height, viewport.MinDepth, viewport.MaxDepth,
-			projMat, viewMat, worldMat
-		);
-
-		DirectX::XMFLOAT3 rayStart;
-		DirectX::XMStoreFloat3(&rayStart, worldPositionVec);
-
-		screenPosition.z = 1.0f;
-		screenPositionVec = DirectX::XMLoadFloat3(&screenPosition);
-		worldPositionVec = DirectX::XMVector3Unproject(
-			screenPositionVec, viewport.TopLeftX, viewport.TopLeftY,
-			viewport.Width, viewport.Height, viewport.MinDepth, viewport.MaxDepth,
-			projMat, viewMat, worldMat
-		);
-
-		DirectX::XMFLOAT3 rayEnd;
-		DirectX::XMStoreFloat3(&rayEnd, worldPositionVec);
-
-		/*HitResult hit;
-		if (stage->raycast(rayStart, rayEnd, hit))
-		{
-			selectedEnemy->setPosition(hit.position);
-		}*/
-	}
-
-	// --- ドロップ処理 ---
-	if (isDragging && selectedEnemy && !(mouse->getButton() & Mouse::BTN_LEFT))
-	{
-		isDragging = false;
-
-		selectedEnemy = nullptr;
-	}
+	
 }
 
 void StageTuta::Reset()

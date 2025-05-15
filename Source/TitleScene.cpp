@@ -77,19 +77,19 @@ void TitleScene::render()
 	// サーバーと接続
 	if (ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_None))
 	{
-		if (ImGui::Button(u8"Stage:1"))
+		if (ImGui::Button(u8"Stage:East"))
 		{
 			SceneManager::instance()->changeScene(new LoadingScene(new StageEast));
 		}
-		if (ImGui::Button(u8"Stage:2"))
+		if (ImGui::Button(u8"Stage:Tuta"))
 		{
 			SceneManager::instance()->changeScene(new LoadingScene(new StageTuta));
 		}
-		if (ImGui::Button(u8"Stage:3"))
+		if (ImGui::Button(u8"Stage:Visible"))
 		{
 			SceneManager::instance()->changeScene(new LoadingScene(new StageVisible));
 		}
-		if (ImGui::Button(u8"Stage:4"))
+		if (ImGui::Button(u8"Stage:Replacement"))
 		{
 			SceneManager::instance()->changeScene(new LoadingScene(new StageReplacement));
 		}

@@ -40,6 +40,9 @@ public:
 
 	//ÕŒ‚‚ğ—^‚¦‚é
 	void addImpulse(const DirectX::XMFLOAT3& impulse);
+
+	//ù‰ñˆ—
+	void turn(float elapsedTime, float vx, float vz, float speed);
 protected:
 	//‘¬“xˆ—XV
 	void updateVelocity(float elapsedTime);
@@ -73,9 +76,6 @@ protected:
 
 	//ˆÚ“®
 	void Move(float vx, float vz, float speed);
-
-	//ù‰ñˆ—
-	void turn(float elapsedTime, float vx, float vz, float speed);
 
 protected:
 	//”¼Œa

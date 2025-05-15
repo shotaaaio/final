@@ -41,6 +41,8 @@ private:
 	void enemyPlacementByTouch(ID3D11DeviceContext* dc);
 
 	bool isEnemyVisible();
+
+	void Chase(float elapsedTime);//敵がプレイヤーを追いかける
 private:
 	// シーン定数
 	struct SceneConstants

@@ -11,10 +11,13 @@
 
 #include "Graphics/Texture.h"
 #include "Mathf.h"
+#include <crtdbg.h>
+#define _CRTDBG_MAP_ALLOC
 
 // 初期化
 void StageVisible::initialize()
 {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	DeviceManager* deviceMgr = DeviceManager::instance();
 
 	// シーン定数バッファの作成
@@ -171,6 +174,8 @@ void StageVisible::update(float elapsedTime)
 	{
 		if (enemyVisibleTime >= 5.0f) player->IsGoal = true;
 	}
+
+	Chase(elapsedTime);
 }
 
 
@@ -515,4 +520,33 @@ bool StageVisible::isEnemyVisible()
 	}
 
 	return false;
+}
+
+void StageVisible::Chase(float elapsedTime)
+{
+	EnemyManager* enemyMgr = EnemyManager::instance();
+
+	int enemyCount = enemyMgr->getEnemyCount();
+
+	for (int i = 0; i < enemyCount; ++i)
+	{
+		Enemy* enemy = enemyMgr->getEnemy(i);
+		DirectX::XMVECTOR EPos = DirectX::XMLoadFloat3(enemy->getPosition());
+		DirectX::XMVECTOR Direction = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(DirectX::XMLoadFloat3(player->getPosition()), EPos));
+
+		// 速度を定義（例：1.0f 単位／秒）
+		float speed = 1.0f;
+		DirectX::XMVECTOR velocity = DirectX::XMVectorScale(Direction, speed * elapsedTime);
+
+		// 移動
+		EPos = DirectX::XMVectorAdd(EPos, velocity);
+		DirectX::XMFLOAT3 ePos;
+		DirectX::XMStoreFloat3(&ePos, EPos);
+		enemy->setPosition(ePos);
+
+		DirectX::XMFLOAT3 direction;
+		DirectX::XMStoreFloat3(&direction, Direction);
+		enemy->turn(elapsedTime, direction.x, direction.z, 5);
+	}
+
 }

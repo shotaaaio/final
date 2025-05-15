@@ -13,7 +13,6 @@
 #include "Mathf.h"
 #include "Ivy.h"
 #include "ObjManager.h"
-#include "Trash.h"
 #include "Goal.h"
 
 // 初期化
@@ -394,46 +393,50 @@ void StageTuta::RenderEnemyGauge(
 			gaugeOffsets[enemy] = { screenPosition.x - gaugeWidth * 0.5f, screenPosition.y - gaugeHeight };
 		}
 
-		float& gaugeOffsetX = gaugeOffsets[enemy].x;
-		float& gaugeOffsetY = gaugeOffsets[enemy].y;
+		float gaugeOffsetX;
+		float gaugeOffsetY;
+		clickMoveGauge(enemy,gaugeWidth,gaugeHeight,gaugeOffsetX,gaugeOffsetY,isDragging,selectedEnemy,enemyi)
 
-		// マウス選択処理
-		if (mouse->getButtonDown() & Mouse::BTN_LEFT)
-		{
-			float mouseX = static_cast<float>(mouse->getPositionX());
-			float mouseY = static_cast<float>(mouse->getPositionY());
+		//float& gaugeOffsetX = gaugeOffsets[enemy].x;
+		//float& gaugeOffsetY = gaugeOffsets[enemy].y;
 
-			// マウスがゲージの範囲内にあるかチェック
-			if (mouseX >= gaugeOffsetX && mouseX <= gaugeOffsetX + gaugeWidth &&
-				mouseY >= gaugeOffsetY && mouseY <= gaugeOffsetY + gaugeHeight)
-			{
-				selectedEnemy = enemy;
-				isDragging = true;
-			}
-		}
+		//// マウス選択処理
+		//if (mouse->getButtonDown() & Mouse::BTN_LEFT)
+		//{
+		//	float mouseX = static_cast<float>(mouse->getPositionX());
+		//	float mouseY = static_cast<float>(mouse->getPositionY());
 
-		// ドラッグ中に位置更新
-		if (isDragging && selectedEnemy == enemy && (mouse->getButton() & Mouse::BTN_LEFT))
-		{
-			gaugeOffsetX = static_cast<float>(mouse->getPositionX()) - gaugeWidth * 0.5f;
-			gaugeOffsetY = static_cast<float>(mouse->getPositionY()) - gaugeHeight;
-			clickGauge[i] = true;
-		}
+		//	// マウスがゲージの範囲内にあるかチェック
+		//	if (mouseX >= gaugeOffsetX && mouseX <= gaugeOffsetX + gaugeWidth &&
+		//		mouseY >= gaugeOffsetY && mouseY <= gaugeOffsetY + gaugeHeight)
+		//	{
+		//		selectedEnemy = enemy;
+		//		isDragging = true;
+		//	}
+		//}
 
-		// マウスボタンを離したらドロップ
-		if (isDragging && selectedEnemy == enemy && !(mouse->getButton() & Mouse::BTN_LEFT))
-		{
-			isDragging = false;
+		//// ドラッグ中に位置更新
+		//if (isDragging && selectedEnemy == enemy && (mouse->getButton() & Mouse::BTN_LEFT))
+		//{
+		//	gaugeOffsetX = static_cast<float>(mouse->getPositionX()) - gaugeWidth * 0.5f;
+		//	gaugeOffsetY = static_cast<float>(mouse->getPositionY()) - gaugeHeight;
+		//	clickGauge[i] = true;
+		//}
 
-			
-			
-		
-			if (gaugeOffsetX + gaugeWidth < 0 || gaugeOffsetX>1280 || gaugeOffsetY + gaugeHeight < 0 || gaugeOffsetY>720)
-			{
-				InputManager::instance()->attack = false;
-			}
-			selectedEnemy = nullptr;
-		}
+		//// マウスボタンを離したらドロップ
+		//if (isDragging && selectedEnemy == enemy && !(mouse->getButton() & Mouse::BTN_LEFT))
+		//{
+		//	isDragging = false;
+
+		//	
+		//	
+		//
+		//	if (gaugeOffsetX + gaugeWidth < 0 || gaugeOffsetX>1280 || gaugeOffsetY + gaugeHeight < 0 || gaugeOffsetY>720)
+		//	{
+		//		InputManager::instance()->attack = false;
+		//	}
+		//	selectedEnemy = nullptr;
+		//}
 		ImGui::Begin("gauge");
 		ImGui::SliderFloat3("gp", &gaugeOffsetX, -5.0f, 5.0f);
 		ImGui::End();
@@ -449,6 +452,59 @@ void StageTuta::RenderEnemyGauge(
 				static_cast<float>(gauge->getTextureWidth()),
 				static_cast<float>(gauge->getTextureHeight())
 			);
+	}
+}
+
+void StageTuta::clickMoveGauge(Enemy* enemy,
+	float gaugeWidth,
+	float gaugeHeight,
+	float& gaugeOffsetX,
+	float& gaugeOffsetY,
+	bool& isDragging,
+	Enemy*& selectedEnemy,
+	int enemyIndex)
+{
+	
+
+	float& gaugeOffsetX = gaugeOffsets[enemy].x;
+	float& gaugeOffsetY = gaugeOffsets[enemy].y;
+
+	// マウス選択処理
+	if (mouse->getButtonDown() & Mouse::BTN_LEFT)
+	{
+		float mouseX = static_cast<float>(mouse->getPositionX());
+		float mouseY = static_cast<float>(mouse->getPositionY());
+
+		// マウスがゲージの範囲内にあるかチェック
+		if (mouseX >= gaugeOffsetX && mouseX <= gaugeOffsetX + gaugeWidth &&
+			mouseY >= gaugeOffsetY && mouseY <= gaugeOffsetY + gaugeHeight)
+		{
+			selectedEnemy = enemy;
+			isDragging = true;
+		}
+	}
+
+	// ドラッグ中に位置更新
+	if (isDragging && selectedEnemy == enemy && (mouse->getButton() & Mouse::BTN_LEFT))
+	{
+		gaugeOffsetX = static_cast<float>(mouse->getPositionX()) - gaugeWidth * 0.5f;
+		gaugeOffsetY = static_cast<float>(mouse->getPositionY()) - gaugeHeight;
+		clickGauge[i] = true;
+	}
+
+	// マウスボタンを離したらドロップ
+	if (isDragging && selectedEnemy == enemy && !(mouse->getButton() & Mouse::BTN_LEFT))
+	{
+		isDragging = false;
+
+
+
+
+		if (gaugeOffsetX + gaugeWidth < 0 || gaugeOffsetX>1280 || gaugeOffsetY + gaugeHeight < 0 || gaugeOffsetY>720)
+		{
+			InputManager::instance()->attack = false;
+		}
+		selectedEnemy = nullptr;
 	}
 }
 

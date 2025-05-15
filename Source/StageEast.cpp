@@ -143,7 +143,6 @@ void StageEast::update(float elapsedTime)
 	//エフェクトの更新
 	EffectManager::instance()->update(elapsedTime);
 
-
 	////	パーティクルシステム更新
 	//if (particle_bomb)
 	//{

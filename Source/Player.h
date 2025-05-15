@@ -60,8 +60,6 @@ private:
 	void inGoal();
 
 	void Timer(float elapsedTime);
-
-	void Chase(float elapsedTime);
 private:
 	//移動スピード
 	float moveSpeed = 5.0f;

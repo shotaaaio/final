@@ -43,6 +43,15 @@ private:
 	void enemyPlacementByTouch(ID3D11DeviceContext* dc, float elapsedTime);
 
 	void Reset();
+
+	void clickMoveGauge(Enemy* enemy,
+		float gaugeWidth,
+		float gaugeHeight,
+		float& gaugeOffsetX,
+		float& gaugeOffsetY,
+		bool& isDragging,
+		Enemy*& selectedEnemy,
+		int enemyIndex);
 private:
 	// ƒV[ƒ“’è”
 	struct SceneConstants

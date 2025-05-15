@@ -660,27 +660,3 @@ void Player::onRayCastHit(DirectX::XMFLOAT3 s, DirectX::XMFLOAT3 e)
 	}
 }
 
-void Player::Chase(float elapsedTime)
-{
-	EnemyManager* enemyMgr = EnemyManager::instance();
-
-	int enemyCount = enemyMgr->getEnemyCount();
-
-		for (int j = 0; j < enemyCount; ++j)
-		{
-			Enemy* enemy = EnemyManager::instance()->getEnemy(j);
-			DirectX::XMVECTOR ePos = DirectX::XMLoadFloat3(enemy->getPosition());
-			DirectX::XMVECTOR direction = DirectX::XMVector3Normalize(DirectX::XMVectorSubtract(ePos, DirectX::XMLoadFloat3(&position)));
-
-			// 速度を定義（例：1.0f 単位／秒）
-			float speed = 1.0f;
-			DirectX::XMVECTOR velocity = DirectX::XMVectorScale(direction, speed * elapsedTime);
-
-			// 移動
-			ePos = DirectX::XMVectorAdd(ePos, velocity);
-
-			//enemy->setPosition(DirectX::ePos)
-		}
-
-}
-

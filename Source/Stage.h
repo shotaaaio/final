@@ -17,6 +17,9 @@ public:
 
 	//レイキャスト
 	bool raycast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, HitResult& hit);
+
+	//スフィアキャスト
+	bool SphereCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, float radius, HitResult& hitResult);
 private:
 	std::unique_ptr<SkinnedMesh>model;
 };

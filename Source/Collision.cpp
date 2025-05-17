@@ -299,3 +299,122 @@ bool Collision::squareVsSquare(
 
 	return true;
 }
+
+bool Collision::intersectSphereCastAndModel(
+	const DirectX::XMFLOAT3& start,
+	const DirectX::XMFLOAT3& end,
+	float radius,
+	const SkinnedMesh* model,
+	HitResult& result)
+{
+	// スフィアキャストの開始位置と終了位置を取得
+	DirectX::XMVECTOR sphereStartVec = DirectX::XMLoadFloat3(&start);
+	DirectX::XMVECTOR sphereEndVec = DirectX::XMLoadFloat3(&end);
+	float radiusSq = radius * radius;
+
+	bool hit = false;
+	float closestDistanceSq = FLT_MAX;
+
+	// モデルのメッシュをループ
+	for (const SkinnedMesh::mesh& mesh : model->meshes)
+	{
+		const std::vector<SkinnedMesh::vertex>& vertices = mesh.vertices;
+		const std::vector<UINT>& indices = mesh.indices;
+
+		// メッシュの全ての三角形をチェック
+		for (size_t i = 0; i < indices.size(); i += 3)
+		{
+			const SkinnedMesh::vertex& a = vertices[indices[i]];
+			const SkinnedMesh::vertex& b = vertices[indices[i + 1]];
+			const SkinnedMesh::vertex& c = vertices[indices[i + 2]];
+
+			// スフィアキャストと三角形の交差判定
+			DirectX::XMFLOAT3 intersectionPoint;
+			if (intersectSphereAndTriangle(start, end, radius, a, b, c, intersectionPoint))
+			{
+				// 最も近い交差点を更新
+				DirectX::XMVECTOR vecToHit = DirectX::XMVectorSubtract(
+					DirectX::XMLoadFloat3(&intersectionPoint),
+					sphereStartVec);
+				float distSq = DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(vecToHit));
+
+				if (distSq < closestDistanceSq)
+				{
+					closestDistanceSq = distSq;
+					result.position = intersectionPoint;
+					hit = true;
+				}
+			}
+		}
+	}
+
+	return hit;
+}
+
+bool Collision::intersectSphereAndTriangle(
+	const DirectX::XMFLOAT3& start,
+	const DirectX::XMFLOAT3& end,
+	float radius,
+	const SkinnedMesh::vertex& a,
+	const SkinnedMesh::vertex& b,
+	const SkinnedMesh::vertex& c,
+	DirectX::XMFLOAT3& outVec)
+{
+	using namespace DirectX;
+
+	// スフィアのキャストされた線分を計算
+	XMVECTOR A = XMLoadFloat3(&a.position);
+	XMVECTOR B = XMLoadFloat3(&b.position);
+	XMVECTOR C = XMLoadFloat3(&c.position);
+	XMVECTOR sphereStart = XMLoadFloat3(&start);
+	XMVECTOR sphereEnd = XMLoadFloat3(&end);
+
+	// 三角形の法線ベクトルを計算
+	XMVECTOR AB = XMVectorSubtract(B, A);
+	XMVECTOR AC = XMVectorSubtract(C, A);
+	XMVECTOR normal = XMVector3Normalize(XMVector3Cross(AB, AC));
+
+	// スフィアキャストの方向ベクトル（start から end への方向）
+	XMVECTOR dir = XMVectorSubtract(sphereEnd, sphereStart);
+
+	// 三角形の平面との交差判定
+	float dist = XMVectorGetX(XMVector3Dot(XMVectorSubtract(sphereStart, A), normal));
+
+	// 平面との距離がスフィアの半径より大きい場合は交差なし
+	if (fabs(dist) > radius) return false;
+
+	// 線分と平面の交点を計算
+	float t = -dist / XMVectorGetX(XMVector3Dot(dir, normal));
+	if (t < 0.0f || t > 1.0f) return false;  // 線分上での交点がない
+
+	// 線分と平面の交点の位置を計算
+	XMVECTOR intersection = XMVectorAdd(sphereStart, XMVectorScale(dir, t));
+
+	// 投影点が三角形内にあるか確認
+	XMVECTOR v0 = XMVectorSubtract(C, A);
+	XMVECTOR v1 = XMVectorSubtract(B, A);
+	XMVECTOR v2 = XMVectorSubtract(intersection, A);
+
+	// 三角形内のバリュ法で判定
+	float d00 = XMVectorGetX(XMVector3Dot(v0, v0));
+	float d01 = XMVectorGetX(XMVector3Dot(v0, v1));
+	float d11 = XMVectorGetX(XMVector3Dot(v1, v1));
+	float d20 = XMVectorGetX(XMVector3Dot(v2, v0));
+	float d21 = XMVectorGetX(XMVector3Dot(v2, v1));
+
+	float denom = d00 * d11 - d01 * d01;
+	if (denom == 0) return false;
+
+	float v = (d11 * d20 - d01 * d21) / denom;
+	float w = (d00 * d21 - d01 * d20) / denom;
+	float u = 1.0f - v - w;
+
+	// 三角形内であれば交差とみなす
+	if (u >= 0 && v >= 0 && w >= 0)
+	{
+		XMStoreFloat3(&outVec, intersection);
+		return true;
+	}
+
+	return false;
+}

@@ -1,6 +1,5 @@
 #pragma once
 #include"Enemy.h"
-#include "OcclusionQuery.h"
 //敵管理
 class EnemyManager
 {
@@ -33,8 +32,6 @@ public:
 	//デバックプリミティブ描画
 	void drawDebugPrimitive();
 
-	void drawImgui();
-
 	//敵の総数を取得
 	int getEnemyCount()const { return static_cast<int>(enemyArray.size()); }
 
@@ -50,7 +47,5 @@ public:
 	Enemy* getEnemyByRay(const DirectX::XMFLOAT3& rayStart, const DirectX::XMFLOAT3& rayEnd);
 private:
 	std::vector<Enemy*>enemyArray;
-	std::vector<Enemy*>removeArray;
-	OcclusionQuery occlusionQuery;
-	
+	std::vector<Enemy*>removeArray;	
 };

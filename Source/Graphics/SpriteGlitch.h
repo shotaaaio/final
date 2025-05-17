@@ -2,11 +2,11 @@
 #include "ShaderManager.h"
 #include "Shader.h"
 
-class GlitchEffectShader : public SpriteShader
+class SpriteGlitchShader : public SpriteShader
 {
 public:
-	GlitchEffectShader(ID3D11Device* device);
-	~GlitchEffectShader()  override{}
+    SpriteGlitchShader(ID3D11Device* device);
+	~SpriteGlitchShader()  override{}
 
 	void Begin(ID3D11DeviceContext* immediate_context)override;
 	void Draw(ID3D11DeviceContext* immediate_context,const RenderContext& rc,const Sprite* sprite)override;

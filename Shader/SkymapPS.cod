@@ -55,7 +55,7 @@ dcl_temps 3
 //   v3.x <- pin.world_position.x; v3.y <- pin.world_position.y; v3.z <- pin.world_position.z; v3.w <- pin.world_position.w; 
 //   o0.x <- <main return value>.x; o0.y <- <main return value>.y; o0.z <- <main return value>.z; o0.w <- <main return value>.w
 //
-#line 9 "C:\Users\2230083\Desktop\そこに愛Eơるんか\HLSL\SkymapPS.hlsl"
+#line 9 "C:\Users\2230083\Desktop\そこに愛Eƨるんか\HLSL\SkymapPS.hlsl"
 mov r0.xyz, -cb2[0].xyzx
 add r0.xyz, r0.xyzx, v3.xyzx
 dp3 r0.w, r0.xyzx, r0.xyzx

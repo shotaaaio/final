@@ -94,7 +94,7 @@ dcl_temps 8
 //   o1.x <- <main return value>.texcoord.x; o1.y <- <main return value>.texcoord.y; 
 //   o0.x <- <main return value>.position.x; o0.y <- <main return value>.position.y; o0.z <- <main return value>.position.z; o0.w <- <main return value>.position.w
 //
-#line 4 "C:\Users\2230083\Desktop\そこに愛EȻるんか\HLSL\SkinnedMeshVS.hlsl"
+#line 4 "C:\Users\2230083\Desktop\そこに愛Eʆるんか\HLSL\SkinnedMeshVS.hlsl"
 itof r0.x, l(0)  // r0.x <- vin.normal.w
 
 #line 6

@@ -1,6 +1,6 @@
 #include "GraphicsManager.h"
 #include "misc.h"
-#include "Glitch_Effect_Shader.h"
+#include "SpriteGlitch.h"
 #include "GaussianBlurShader.h"
 #include "LuminanceExtractionShader.h"
 #include "DeviceManager.h"
@@ -177,7 +177,7 @@ bool GraphicsManager::initialize(ID3D11Device* device, ID3D11DeviceContext* dc)
 	// デバッグレンダラー
 	debugRenderer = std::make_unique<DebugRenderer>(device);
 	
-	spriteShaders[static_cast<int>(SpriteShaderID::Glitch)]              = std::make_unique<GlitchEffectShader>(device);
+	spriteShaders[static_cast<int>(SpriteShaderID::Glitch)]              = std::make_unique<SpriteGlitchShader>(device);
 	spriteShaders[static_cast<int>(SpriteShaderID::GaussianBlur)]        = std::make_unique<GaussianBlurShader>(device);
 	spriteShaders[static_cast<int>(SpriteShaderID::LuminanceExtraction)] = std::make_unique<LumianceExtractionShader>(device);
 	// ラインレンダラー

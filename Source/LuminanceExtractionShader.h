@@ -1,6 +1,6 @@
 #pragma once
 #include "Graphics/ShaderManager.h"
-#include "Shader.h"
+#include "Graphics/Shader.h"
 
 class LumianceExtractionShader : public SpriteShader
 {

@@ -92,10 +92,10 @@ protected:
 	float height = 2.0f;
 
 	//ライフ
-	int health = 5;
+	int health = 100;
 
 	//最大ライフ
-	int maxHealth = 5;
+	int maxHealth = 100;
 
 	//無敵時間
 	float invincibleTimer = 0.5f;

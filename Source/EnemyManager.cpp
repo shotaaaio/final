@@ -1,6 +1,5 @@
 #include"EnemyManager.h"
 #include"Collision.h"
-#include "DeviceManager.h"
 
 //XVˆ—
 void EnemyManager::update(float elapsedTime)
@@ -28,20 +27,14 @@ void EnemyManager::update(float elapsedTime)
 	//“G“¯Žm‚ÌÕ“Ë”»’è
 	collisionEnemiesAndEnemies();
 
-	occlusionQuery.CheckCountTimer(elapsedTime);
-
 }
 
 //•`‰æˆ—
 void EnemyManager::render(ID3D11DeviceContext* dc)
 {
-	occlusionQuery.CheckPixelCount(dc);
-
 	for (Enemy* enemy : enemyArray)
 	{
-		occlusionQuery.BeginQuery(enemy, dc);
 		enemy->render(dc);
-		occlusionQuery.EndQuery(enemy, dc);
 	}
 }
 
@@ -66,11 +59,6 @@ void EnemyManager::drawDebugPrimitive()
 	{
 		enemy->drawDebugPrimitive();
 	}
-}
-
-void EnemyManager::drawImgui()
-{
-	occlusionQuery.DrawImGui();
 }
 
 void EnemyManager::collisionEnemiesAndEnemies()

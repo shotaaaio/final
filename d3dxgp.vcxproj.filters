@@ -61,6 +61,15 @@
     <Filter Include="Source\Graphics\LuminanceExtractionShader">
       <UniqueIdentifier>{1c6471d4-80b9-4d58-88d2-b89e45d57b8b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\UI elements">
+      <UniqueIdentifier>{eaba9093-8b4a-4484-b19e-e446349dbfca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI elements\SceneUI">
+      <UniqueIdentifier>{578cba18-b870-413a-9036-133d246cfa9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\UI elements\UI">
+      <UniqueIdentifier>{d9955014-0eab-436b-99ef-0ff21e2e6c5c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Framework.cpp">
@@ -153,13 +162,7 @@
     <ClCompile Include="Source\ObjManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Source\OcclusionQuery.cpp">
-      <Filter>Source\System\OcclusionQuery</Filter>
-    </ClCompile>
     <ClCompile Include="Source\TitleScene.cpp">
-      <Filter>Source\Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\GameScene2.cpp">
       <Filter>Source\Scene</Filter>
     </ClCompile>
     <ClCompile Include="Source\GameScene.cpp">
@@ -210,7 +213,7 @@
     <ClCompile Include="Source\HomingBullet.cpp">
       <Filter>Source\Manager</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Graphics\Glitch_Effect_Shader.cpp">
+    <ClCompile Include="Source\Graphics\SpriteGlitch.cpp">
       <Filter>Source\Graphics\GlitchEffectShader</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\GaussianBlurShader.cpp">
@@ -227,6 +230,15 @@
     </ClCompile>
     <ClCompile Include="Source\obj.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\UIManager.cpp">
+      <Filter>Source\UI elements\UI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneGameUI.cpp">
+      <Filter>Source\UI elements\SceneUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SceneTitleUI.cpp">
+      <Filter>Source\UI elements\SceneUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -326,13 +338,7 @@
     <ClInclude Include="Source\particle\particle_system.h">
       <Filter>Source\Particle</Filter>
     </ClInclude>
-    <ClInclude Include="Source\OcclusionQuery.h">
-      <Filter>Source\System\OcclusionQuery</Filter>
-    </ClInclude>
     <ClInclude Include="Source\TitleScene.h">
-      <Filter>Source\Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\GameScene2.h">
       <Filter>Source\Scene</Filter>
     </ClInclude>
     <ClInclude Include="Source\GameScene.h">
@@ -392,11 +398,8 @@
     <ClInclude Include="Source\HomingBullet.h">
       <Filter>Source\Manager</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\Glitch_Effect_Shader.h">
+    <ClInclude Include="Source\Graphics\SpriteGlitch.h">
       <Filter>Source\Graphics\GlitchEffectShader</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Shader.h">
-      <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\GaussianBlurShader.h">
       <Filter>Source\Graphics\GaussianBlurShader</Filter>
@@ -415,6 +418,19 @@
     </ClInclude>
     <ClInclude Include="Source\obj.h">
       <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader.h" />
+    <ClInclude Include="Source\UIManager.h">
+      <Filter>Source\UI elements\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\UIComponent.h">
+      <Filter>Source\UI elements\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneGameUI.h">
+      <Filter>Source\UI elements\SceneUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SceneTitleUI.h">
+      <Filter>Source\UI elements\SceneUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -439,7 +455,7 @@
     <None Include="HLSL\geometry_particle.hlsli">
       <Filter>HLSL</Filter>
     </None>
-    <None Include="HLSL\Glitch_Effect.hlsli">
+    <None Include="HLSL\SpriteGlitch.hlsli">
       <Filter>HLSL\GlitchEffect</Filter>
     </None>
     <None Include="HLSL\math_utils.hlsli">
@@ -501,10 +517,10 @@
     <FxCompile Include="HLSL\geometry_particle_vs.hlsl">
       <Filter>HLSL</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\Glitch_Effect_vs.hlsl">
+    <FxCompile Include="HLSL\SpriteGlitch_vs.hlsl">
       <Filter>HLSL\GlitchEffect</Filter>
     </FxCompile>
-    <FxCompile Include="HLSL\Glitch_Effect_ps.hlsl">
+    <FxCompile Include="HLSL\SpriteGlitch_ps.hlsl">
       <Filter>HLSL\GlitchEffect</Filter>
     </FxCompile>
     <FxCompile Include="HLSL\GaussianBlur_vs.hlsl">

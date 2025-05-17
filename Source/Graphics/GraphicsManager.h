@@ -57,33 +57,30 @@ struct LumianceExtractionData
 //グリッチ情報
 struct GlitchData
 {
-	  float time;                // 経過時間
-    float density;             // 密度
-    float shift;               // ずらす幅
-    float line_impact;         // 一本線の影響度
+	float time;                //経過時間
+    float density;             //密度
+    float shift;               //ずらす幅
+    float line_impact;         //一本線の影響度
 
-    DirectX::XMFLOAT2 x_shift;   // xの横をどの程度ずらすのか
-    DirectX::XMFLOAT2 y_shift;   // yの横をどの程度ずらすのか
+    DirectX::XMFLOAT2 x_shift; //xの横をどの程度ずらすのか
+    DirectX::XMFLOAT2 y_shift; //yの横をどの程度ずらすのか
 
-    float rand_float;          // ランダム性
-    float x_shifting;          // 色収差のxの位置をずらす
-    float y_shifting;          // 色収差のyの位置をずらす    
-    float extension;           // uvの拡張
+    float rand_float;          //ランダム性
+    float x_shifting;          //色収差のxの位置をずらす
+    float y_shifting;          //色収差のyの位置をずらす    
+    float extension;           //uvの拡張
 
-    float uv_slider;           // 左上に流す
-    float brightness;          // 明るさ
-    float glitch_mask_radius;  // マスク半径
-    int glitch_sampling_count; // 回数
+    float uv_slider;           //左上に流す
+    float brightness;          //明るさ
+    float glitch_mask_radius;  //マスク半径
+    int   glitch_sampling_count; //回数
 
-    DirectX::XMFLOAT2 center = { 0.5f, 0.5f };    // 中心
-    float gage = 0.0f;
+    DirectX::XMFLOAT2 center = { 0.5f, 0.5f };    //中心
+    float gage;
 
-    float rect_noise_width;    // ズ矩形の幅（UV空間）
-    float rect_noise_height;   // ズ矩形の高さ（UV空間）
-    float rect_noise_strength; // ズ強度（0〜1）
-
-    float flash_frequency;     // フラッシュ周期（秒）
-    float flash_strength;      // フラッシュ反転割合（0〜1）
+    float rect_noise_width;    //ノイズ矩形の幅（UV空間）
+    float rect_noise_height;   //ノイズ矩形の高さ（UV空間）
+    float rect_noise_strength; //ノイズ強度（0〜1）
 };
 
 enum class SpriteShaderID
@@ -168,5 +165,4 @@ private:
 
 	float	screenWidth;
 	float	screenHeight;
-
 };

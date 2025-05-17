@@ -4,7 +4,6 @@
 #include"Input/InputManager.h"
 #include"SceneManager.h"
 #include"GameScene.h"
-#include"GameScene2.h"
 #include"LoadingScene.h"
 #include "imgui.h"
 
@@ -28,10 +27,10 @@ void TitleScene::update(float elapsedTime)
 	GamePad* gamePad = InputManager::instance()->getGamePad();
 
 	//ƒ{ƒ^ƒ“‚ð‰Ÿ‚µ‚½‚çƒQ[ƒ€ƒV[ƒ“‚É‘JˆÚ
-	/*if (gamePad->getButtonDown() & GamePad::BTN_A)
+	if (gamePad->getButtonDown() & GamePad::BTN_A)
 	{
 		SceneManager::instance()->changeScene(new LoadingScene(new GameScene));
-	}*/
+	}
 }
 
 //•`‰æˆ—
@@ -78,10 +77,6 @@ void TitleScene::render()
 		if (ImGui::Button(u8"Stage:1"))
 		{
 			SceneManager::instance()->changeScene(new LoadingScene(new GameScene));
-		}
-		if (ImGui::Button(u8"Stage:2"))
-		{
-			SceneManager::instance()->changeScene(new LoadingScene(new GameScene2));
 		}
 	}
 	ImGui::End();

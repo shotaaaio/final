@@ -1,8 +1,8 @@
 #include "Misc.h"
-#include "Glitch_Effect_Shader.h"
+#include "SpriteGlitch.h"
 #include "Buffer.h"
 
-GlitchEffectShader::GlitchEffectShader(ID3D11Device* device)
+SpriteGlitchShader::SpriteGlitchShader(ID3D11Device* device)
 {
 		// 入力レイアウト
 		D3D11_INPUT_ELEMENT_DESC inputElementDesc[] =
@@ -13,10 +13,10 @@ GlitchEffectShader::GlitchEffectShader(ID3D11Device* device)
 		};
 
 		ShaderManager* shader = ShaderManager::instance();
-		shader->createVsFromCso(device, "Shader/Glitch_Effect_vs.cso", vertexxShader.GetAddressOf(), inputLayout.GetAddressOf(), inputElementDesc, _countof(inputElementDesc));
-		shader->createPsFromCso(device, "Shader/Glitch_Effect_ps.cso", pixelShader.GetAddressOf());
+		shader->createVsFromCso(device, "Shader/SpriteGlitch_vs.cso", vertexxShader.GetAddressOf(), inputLayout.GetAddressOf(), inputElementDesc, _countof(inputElementDesc));
+		shader->createPsFromCso(device, "Shader/SpriteGlitch_ps.cso", pixelShader.GetAddressOf());
 
-		createBuffer<GlitchEffectShader::glitch_shader_constants>(device, glitchConstantBuffer.GetAddressOf());
+		createBuffer<SpriteGlitchShader::glitch_shader_constants>(device, glitchConstantBuffer.GetAddressOf());
 
 		// ブレンドステート
 		{
@@ -87,7 +87,7 @@ GlitchEffectShader::GlitchEffectShader(ID3D11Device* device)
 		}
 }
 
-void GlitchEffectShader::Begin(ID3D11DeviceContext* immediate_context)
+void SpriteGlitchShader::Begin(ID3D11DeviceContext* immediate_context)
 {
 	immediate_context->VSSetShader(vertexxShader.Get(), nullptr, 0);
 	immediate_context->PSSetShader(pixelShader.Get(), nullptr, 0);
@@ -109,7 +109,7 @@ void GlitchEffectShader::Begin(ID3D11DeviceContext* immediate_context)
 	immediate_context->RSSetState(rasterizerState.Get());
 	immediate_context->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 }
-void GlitchEffectShader::Draw(ID3D11DeviceContext* immediate_context, const RenderContext& rc, const Sprite* sprite)
+void SpriteGlitchShader::Draw(ID3D11DeviceContext* immediate_context, const RenderContext& rc, const Sprite* sprite)
 {
 	// 定数バッファにセットするためのデータを格納する構造体
 	glitch_shader_constants glitch_shader_constants;
@@ -132,8 +132,6 @@ void GlitchEffectShader::Draw(ID3D11DeviceContext* immediate_context, const Rend
 	glitch_shader_constants.rect_noise_width = rc.glitchData.rect_noise_width;
 	glitch_shader_constants.rect_noise_height = rc.glitchData.rect_noise_height;
 	glitch_shader_constants.rect_noise_strength = rc.glitchData.rect_noise_strength;
-	glitch_shader_constants.flash_frequency = rc.glitchData.flash_frequency;
-	glitch_shader_constants.flash_strength = rc.glitchData.flash_strength;
 
 	// 定数バッファの更新
 	immediate_context->UpdateSubresource(glitchConstantBuffer.Get(), 0, nullptr, &glitch_shader_constants, 0, 0);
@@ -150,7 +148,7 @@ void GlitchEffectShader::Draw(ID3D11DeviceContext* immediate_context, const Rend
 	immediate_context->Draw(4, 0);
 }
 
-void GlitchEffectShader::End(ID3D11DeviceContext* immediate_context)
+void SpriteGlitchShader::End(ID3D11DeviceContext* immediate_context)
 {
 	immediate_context->VSSetShader(nullptr, nullptr, 0);
 	immediate_context->PSSetShader(nullptr, nullptr, 0);

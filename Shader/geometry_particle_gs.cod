@@ -62,7 +62,7 @@ dcl_maxout 4
 //   v[0][2].x <- gin[0].color.x; v[0][2].y <- gin[0].color.y; v[0][2].z <- gin[0].color.z; v[0][2].w <- gin[0].color.w; 
 //   v[0][3].x <- gin[0].param.x; v[0][3].y <- gin[0].param.y; v[0][3].z <- gin[0].param.z; v[0][3].w <- gin[0].param.w
 //
-#line 9 "C:\Users\2230083\Desktop\そこに愛Eȧるんか\HLSL\geometry_particle_gs.hlsl"
+#line 9 "C:\Users\2230083\Desktop\そこに愛Eǘるんか\HLSL\geometry_particle_gs.hlsl"
 mul r0.xyzw, cb4[0].xyzw, v[0][0].xxxx
 mul r1.xyzw, cb4[1].xyzw, v[0][0].yyyy
 add r0.xyzw, r0.xyzw, r1.xyzw

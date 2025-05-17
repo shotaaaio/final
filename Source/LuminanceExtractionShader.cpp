@@ -11,8 +11,8 @@ LumianceExtractionShader::LumianceExtractionShader(ID3D11Device* device)
 	};
 
 	ShaderManager* shader = ShaderManager::instance();
-	shader->createVsFromCso(device, "Shader/Glitch_Effect_vs.cso", vertexShader.GetAddressOf(), inputLayout.GetAddressOf(), inputElementDesc, _countof(inputElementDesc));
-	shader->createPsFromCso(device, "Shader/Glitch_Effect_ps.cso", pixelShader.GetAddressOf());
+	shader->createVsFromCso(device, "Shader/LuminanceExtraction_vs.cso", vertexShader.GetAddressOf(), inputLayout.GetAddressOf(), inputElementDesc, _countof(inputElementDesc));
+	shader->createPsFromCso(device, "Shader/LuminanceExtraction_ps.cso", pixelShader.GetAddressOf());
 
 	createBuffer<LumianceExtractionShader::CBLuminanceExtrantiion>(device, luminanceExtractionConstantBuffer.GetAddressOf());
 

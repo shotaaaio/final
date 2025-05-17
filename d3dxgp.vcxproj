@@ -198,10 +198,9 @@
     <ClCompile Include="Source\EnemySlime.cpp" />
     <ClCompile Include="Source\Framework.cpp" />
     <ClCompile Include="Source\GameScene.cpp" />
-    <ClCompile Include="Source\GameScene2.cpp" />
     <ClCompile Include="Source\Graphics\DebugRenderer.cpp" />
     <ClCompile Include="Source\Graphics\GaussianBlurShader.cpp" />
-    <ClCompile Include="Source\Graphics\Glitch_Effect_Shader.cpp" />
+    <ClCompile Include="Source\Graphics\SpriteGlitch.cpp" />
     <ClCompile Include="Source\Graphics\GraphicsManager.cpp" />
     <ClCompile Include="Source\Graphics\ImGuiRenderer.cpp" />
     <ClCompile Include="Source\Graphics\LineRenderer.cpp" />
@@ -221,15 +220,17 @@
     <ClCompile Include="Source\obj.cpp" />
     <ClCompile Include="Source\Object.cpp" />
     <ClCompile Include="Source\ObjManager.cpp" />
-    <ClCompile Include="Source\OcclusionQuery.cpp" />
     <ClCompile Include="Source\particle\particle_system.cpp" />
     <ClCompile Include="Source\Player.cpp" />
     <ClCompile Include="Source\PostprocessingRenderer.cpp" />
     <ClCompile Include="Source\RenderTarget.cpp" />
+    <ClCompile Include="Source\SceneGameUI.cpp" />
     <ClCompile Include="Source\SceneManager.cpp" />
+    <ClCompile Include="Source\SceneTitleUI.cpp" />
     <ClCompile Include="Source\Stage.cpp" />
     <ClCompile Include="Source\StraightBullet.cpp" />
     <ClCompile Include="Source\TitleScene.cpp" />
+    <ClCompile Include="Source\UIManager.cpp" />
     <ClCompile Include="Utils\imgui\imgui.cpp" />
     <ClCompile Include="Utils\imgui\imgui_demo.cpp" />
     <ClCompile Include="Utils\imgui\imgui_draw.cpp" />
@@ -255,13 +256,13 @@
     <ClInclude Include="Source\EnemySlime.h" />
     <ClInclude Include="Source\Framework.h" />
     <ClInclude Include="Source\GameScene.h" />
-    <ClInclude Include="Source\GameScene2.h" />
     <ClInclude Include="Source\Graphics\Buffer.h" />
     <ClInclude Include="Source\Graphics\DebugRenderer.h" />
-    <ClInclude Include="Source\Graphics\Glitch_Effect_Shader.h" />
+    <ClInclude Include="Source\Graphics\SpriteGlitch.h" />
     <ClInclude Include="Source\Graphics\GraphicsManager.h" />
     <ClInclude Include="Source\Graphics\ImGuiRenderer.h" />
     <ClInclude Include="Source\Graphics\LineRenderer.h" />
+    <ClInclude Include="Source\Graphics\Shader.h" />
     <ClInclude Include="Source\Graphics\ShaderManager.h" />
     <ClInclude Include="Source\Graphics\SkinnedMesh.h" />
     <ClInclude Include="Source\Graphics\Skymap.h" />
@@ -280,18 +281,20 @@
     <ClInclude Include="Source\obj.h" />
     <ClInclude Include="Source\Object.h" />
     <ClInclude Include="Source\ObjManager.h" />
-    <ClInclude Include="Source\OcclusionQuery.h" />
     <ClInclude Include="Source\particle\particle_system.h" />
     <ClInclude Include="Source\Player.h" />
     <ClInclude Include="Source\PostprocessingRenderer.h" />
     <ClInclude Include="Source\RenderTarget.h" />
     <ClInclude Include="Source\Scene.h" />
+    <ClInclude Include="Source\SceneGameUI.h" />
     <ClInclude Include="Source\SceneManager.h" />
-    <ClInclude Include="Source\Shader.h" />
+    <ClInclude Include="Source\SceneTitleUI.h" />
     <ClInclude Include="Source\Stage.h" />
     <ClInclude Include="Source\StageManager.h" />
     <ClInclude Include="Source\StraightBullet.h" />
     <ClInclude Include="Source\TitleScene.h" />
+    <ClInclude Include="Source\UIComponent.h" />
+    <ClInclude Include="Source\UIManager.h" />
     <ClInclude Include="Source\Utilities.h" />
     <ClInclude Include="Utils\imgui\imconfig.h" />
     <ClInclude Include="Utils\imgui\imgui.h" />
@@ -305,7 +308,7 @@
     <None Include="HLSL\FilterFunctions.hlsli" />
     <None Include="HLSL\GaussianBlur.hlsli" />
     <None Include="HLSL\geometry_particle.hlsli" />
-    <None Include="HLSL\Glitch_Effect.hlsli" />
+    <None Include="HLSL\SpriteGlitch.hlsli" />
     <None Include="HLSL\ImGui.hlsli" />
     <None Include="HLSL\Line.hlsli" />
     <None Include="HLSL\LuminanceExtraction.hlsli" />
@@ -347,13 +350,13 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\Glitch_Effect_ps.hlsl">
+    <FxCompile Include="HLSL\SpriteGlitch_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
-    <FxCompile Include="HLSL\Glitch_Effect_vs.hlsl">
+    <FxCompile Include="HLSL\SpriteGlitch_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>

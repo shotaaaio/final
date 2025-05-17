@@ -56,8 +56,7 @@ inline void to_json(json& j, const GlitchData& d)
         {"rect_noise_width", d.rect_noise_width},
         {"rect_noise_height", d.rect_noise_height},
         {"rect_noise_strength", d.rect_noise_strength},
-        {"flash_frequency", d.flash_frequency},
-        {"flash_strength", d.flash_strength}
+      
     };
 }
 
@@ -74,6 +73,5 @@ inline void from_json(const json& j, GlitchData& d)
     d.rect_noise_width = j.value("rect_noise_width", d.rect_noise_width);
     d.rect_noise_height = j.value("rect_noise_height", d.rect_noise_height);
     d.rect_noise_strength = j.value("rect_noise_strength", d.rect_noise_strength);
-    d.flash_frequency = j.value("flash_frequency", d.flash_frequency);
-    d.flash_strength = j.value("flash_strength", d.flash_strength);
+ 
 }

@@ -87,4 +87,36 @@ public:
 		DirectX::XMFLOAT2 posB,
 		DirectX::XMFLOAT2 sizeB
 	);
+
+// <summary>
+/// 球とモデルの交差判定
+/// </summary>
+/// <param name="sphereCenter">球の中心</param>
+/// <param name="radius">球の半径</param>
+/// <param name="model">モデル</param>
+/// <param name="result">ヒット結果</param>
+/// <returns>true...交差した</returns>
+	static bool intersectSphereCastAndModel(
+		const DirectX::XMFLOAT3& start,
+		const DirectX::XMFLOAT3& end,
+		float radius,
+		const SkinnedMesh* model,
+		HitResult& result);
+
+	/// <summary>
+	/// 球と三角形の交差判定
+	/// </summary>
+	/// <param name="sphereCenter">球の中心</param>
+	/// <param name="radius">球の半径</param>
+	/// <param name="triangle">三角形</param>
+	/// <param name="outVec">交点位置（出力用）</param>
+	/// <returns>true...交差した</returns>
+	static bool intersectSphereAndTriangle(
+		const DirectX::XMFLOAT3& start,
+		const DirectX::XMFLOAT3& end,
+		float radius,
+		const SkinnedMesh::vertex& a,
+		const SkinnedMesh::vertex& b,
+		const SkinnedMesh::vertex& c,
+		DirectX::XMFLOAT3& outVec);
 };

@@ -1,6 +1,5 @@
 #pragma once
 #include "GraphicsManager.h"
-
 class ShaderManager
 {
 private:

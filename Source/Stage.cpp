@@ -25,3 +25,8 @@ bool Stage::raycast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end
 {
 	return Collision::intersectRayAndModel(start, end, model.get(), hit);
 }
+
+bool Stage::SphereCast(const DirectX::XMFLOAT3& start, const DirectX::XMFLOAT3& end, float radius, HitResult& hitResult)
+{
+	return Collision::intersectSphereCastAndModel(start,end,radius,model.get(),hitResult);
+}

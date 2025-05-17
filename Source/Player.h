@@ -50,9 +50,6 @@ private:
 	//入力値から移動ベクトルを取得
 	DirectX::XMFLOAT3 getMoveVec()const;
 
-	void Hashigo();
-
-	void inGoal();
 private:
 	//移動スピード
 	float moveSpeed = 5.0f;

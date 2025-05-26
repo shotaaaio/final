@@ -78,6 +78,25 @@ void GameScene::initialize()
 		particle_bomb = std::make_unique<ParticleSystem>(deviceMgr->getDevice(), shader_resource_view, 5, 5);
 	}
 
+	//新しい描画ターゲットの生成
+	{
+		renderTarget = std::make_unique<RenderTarget>(
+			static_cast<UINT>(deviceMgr->getScreenWidth()),
+			static_cast<UINT>(deviceMgr->getScreenHeight()),
+			DXGI_FORMAT_R8G8B8A8_UNORM);
+	}
+
+	//ポストプロセス描画クラス生成
+	{
+		//postprosessingRenderer = std::make_unique<PostprosessingRenderer>();
+		////シーンテクスチャを設定しておく
+		//ShaderResourceViewData srvData;
+		//srvData.srv = renderTarget->GetShaderResorceView();
+		//srvData.width = renderTarget->GetWidth();
+		//srvData.height = renderTarget->GetHeight();
+		//postprosessingRenderer->SetSceneData(srvData);
+	}
+
 }
 
 // 終了処理
@@ -119,7 +138,6 @@ void GameScene::update(float elapsedTime)
 	{
 		glitchData.time = 0.1f;
 	}
-
 }
 
 
@@ -257,10 +275,10 @@ void GameScene::render()
 		SpriteShader* glitchShader = graphics->GetShader(SpriteShaderID::Glitch);
 		SpriteShader* luminanceShader = graphics->GetShader(SpriteShaderID::LuminanceExtraction);
 
-		//glitchShader->Begin(dc);
-		//rc.glitchData = glitchData;
-		//glitchShader->Draw(dc, rc, hp.get());
-		//glitchShader->End(dc);
+		glitchShader->Begin(dc);
+		rc.glitchData = glitchData;
+		glitchShader->Draw(dc, rc, hp.get());
+		glitchShader->End(dc);
 
 	/*	rc.gaussianFilterData = gaussianFilterData;
 		rc.gaussianFilterData.textureSize.x = hp->getTextureWidth();

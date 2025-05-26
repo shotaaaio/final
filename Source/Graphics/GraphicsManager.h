@@ -128,8 +128,6 @@ public:
 
 	bool initialize(ID3D11Device* device, ID3D11DeviceContext* dc);
 
-	ID3D11Device* GetDevice() const { return device.Get(); }
-
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> getSamplerState(SAMPLER_STATE state) const { return renderContext.samplerStates[static_cast<int>(state)]; }
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> getDepthStencilStates(DEPTH_STENCIL_STATE state) const { return renderContext.depthStencilStates[static_cast<int>(state)]; }
@@ -137,12 +135,6 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11BlendState> getBlendStates(BLEND_STATE state) const { return renderContext.blendStates[static_cast<int>(state)]; }
 
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> getRasterizerStates(RASTERIZER_STATE state) const { return renderContext.rasterizerStates[static_cast<int>(state)]; }
-
-	// スクリーン幅取得
-	float GetScreenWidth() const { return screenWidth; }
-
-	// スクリーン高さ取得
-	float GetScreenHeight() const { return screenHeight; }
 
 	void SettingRenderContext(void(*settingCallback)(ID3D11DeviceContext*, RenderContext*));
 

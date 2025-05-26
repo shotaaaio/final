@@ -24,6 +24,8 @@ void HPGaugeUI::Update(float elapsedTime)
 
 void HPGaugeUI::Render(ID3D11DeviceContext* dc)
 {
+	DeviceManager* deiceM = DeviceManager::instance();
+
 	if (!m_HP_barSprite || !m_HP_frameSprite || !m_currentHp || m_maxHp <= 0.0f)
 		return;
 
@@ -31,7 +33,7 @@ void HPGaugeUI::Render(ID3D11DeviceContext* dc)
 	float fullWidth = static_cast<float>(m_HP_barSprite->getTextureWidth());
 	float height = static_cast<float>(m_HP_barSprite->getTextureHeight());
 
-	float screenHeight = GraphicsManager::instance()->GetScreenHeight();
+	float screenHeight = deiceM->getScreenWidth();
 	float posX = 0.0f;
 	float posY = screenHeight - height;
 
@@ -57,9 +59,10 @@ void TimeDisplayUI::Update(float elapsedTime)
 
 void TimeDisplayUI::Render(ID3D11DeviceContext* dc)
 {
+	DeviceManager* deiceM = DeviceManager::instance();
 	//画面サイズ
-	float screenWidth = GraphicsManager::instance()->GetScreenWidth();
-	float screenHeight = GraphicsManager::instance()->GetScreenHeight();
+	float screenWidth = deiceM->getScreenWidth();
+	float screenHeight = deiceM->getScreenHeight();
 
 	//スプライトの幅と高さを取得
 	float spriteWidth = static_cast<float>(m_Time_FrameSprite->getTextureWidth());
@@ -72,6 +75,9 @@ void TimeDisplayUI::Render(ID3D11DeviceContext* dc)
 	m_Time_FrameSprite->render(dc, posX, posY, spriteWidth, spriteHeight);
 }
 
+
+//現在は画面右下にひし形の各頂点にUIを配置する形にしようと思っているが、
+//後に画面左したで、1枚絵として表示する可能性大
 void ActionButtonsUI::Initialize()
 {
 	m_buttonSprites.clear();
@@ -100,8 +106,10 @@ void ActionButtonsUI::Update(float elapsedTime)
 
 void ActionButtonsUI::Render(ID3D11DeviceContext* dc)
 {
-	float screenWidth = GraphicsManager::instance()->GetScreenWidth();
-	float screenHeight = GraphicsManager::instance()->GetScreenHeight();
+	DeviceManager* deiceM = DeviceManager::instance();
+
+	float screenWidth = deiceM->getScreenWidth();
+	float screenHeight = deiceM->getScreenHeight();
 
 	//画面右下の基準点 右端・下端から100px内側に設定
 	float baseX = screenWidth - 100.0f;

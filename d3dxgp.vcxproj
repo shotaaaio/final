@@ -183,6 +183,7 @@
     <ClCompile Include="Source\Audio\Audio.cpp" />
     <ClCompile Include="Source\Audio\AudioManager.cpp" />
     <ClCompile Include="Source\Audio\AudioResource.cpp" />
+    <ClCompile Include="Source\BossEnemy.cpp" />
     <ClCompile Include="Source\Bullet.cpp" />
     <ClCompile Include="Source\BulletManager.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
@@ -241,6 +242,7 @@
     <ClInclude Include="Source\Audio\Audio.h" />
     <ClInclude Include="Source\Audio\AudioManager.h" />
     <ClInclude Include="Source\Audio\AudioResource.h" />
+    <ClInclude Include="Source\BossEnemy.h" />
     <ClInclude Include="Source\Buller.h" />
     <ClInclude Include="Source\BulletManager.h" />
     <ClInclude Include="Source\Camera.h" />

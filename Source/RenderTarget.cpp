@@ -1,11 +1,12 @@
 #include "stdlib.h"
-#include "Graphics/GraphicsManager.h"
 #include "RenderTarget.h"
+#include "DeviceManager.h"
 
 #include "Misc.h"
 RenderTarget::RenderTarget(UINT width, UINT height, DXGI_FORMAT format)
 {
-	ID3D11Device* device = GraphicsManager::instance()->GetDevice();
+	
+	ID3D11Device* device = DeviceManager::instance()->getDevice();
 
 	texture2dDesc = {};
 	texture2dDesc.Width = width;

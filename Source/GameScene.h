@@ -12,7 +12,8 @@
 #include "particle/particle_system.h"
 #include "Enemy.h"
 #include "OcclusionQuery.h"
-
+#include "RenderTarget.h"
+//#include "PostprocessingRenderer.h"
 // ゲームシーン
 class GameScene :public Scene
 {
@@ -66,7 +67,12 @@ private:
 	GlitchData glitchData;                        //グリッチ
 	GaussianFilterData gaussianFilterData;        //暈し
 	LumianceExtractionData lumianceExtractionData;//ブルーム
-	
+
+	//オフスクリーンレンダリング用描画ターゲット
+	std::unique_ptr<RenderTarget> renderTarget;
+
+	//ポストプロセス
+	//std::unique_ptr<PostprosessingRenderer>postprosessingRenderer;
 	
 	std::unique_ptr<Sprite> gaussianBlurSprite;
 	std::unique_ptr<ParticleSystem>particle_bomb;

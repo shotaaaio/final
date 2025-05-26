@@ -23,6 +23,8 @@
 //	{
 //		//	‚‹P“x’Šo—pî•ñ
 //		LumianceExtractionData	luminanceExtractionData;
+//
+//		GaussianFilterData gaussianFilterData;
 //	};
 //public:
 //	PostprosessingRenderer();

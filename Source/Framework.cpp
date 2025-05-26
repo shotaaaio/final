@@ -6,6 +6,7 @@
 #include "Graphics/GraphicsManager.h"
 #include "TitleScene.h"
 #include "SceneManager.h"
+#include "GameScene.h"
 
 // コンストラクタ
 Framework::Framework(HWND hwnd) : hwnd(hwnd)

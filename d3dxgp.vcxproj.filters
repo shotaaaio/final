@@ -240,6 +240,9 @@
     <ClCompile Include="Source\SceneTitleUI.cpp">
       <Filter>Source\UI elements\SceneUI</Filter>
     </ClCompile>
+    <ClCompile Include="Source\BossEnemy.cpp">
+      <Filter>Source\Manager</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Framework.h">
@@ -431,6 +434,9 @@
     </ClInclude>
     <ClInclude Include="Source\SceneTitleUI.h">
       <Filter>Source\UI elements\SceneUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\BossEnemy.h">
+      <Filter>Source\Manager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

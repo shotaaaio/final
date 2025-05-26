@@ -6,13 +6,15 @@
 #include"GameScene.h"
 #include"LoadingScene.h"
 #include "imgui.h"
-
+#include "SceneTitleUI.h"
 
 //初期化処理
 void TitleScene::initialize()
 {
 	//タイトル画像読み込み
-	titleImage = std::make_unique<Sprite>(DeviceManager::instance()->getDevice(), L"Resources\\Image\\Title.png");
+	m_UIManager = std::make_unique<UIManager>();
+	m_UIManager->AddUI(std::make_shared<TitleUI>());
+	m_UIManager->Initialize();
 }
 
 //終了化
@@ -31,6 +33,7 @@ void TitleScene::update(float elapsedTime)
 	{
 		SceneManager::instance()->changeScene(new LoadingScene(new GameScene));
 	}
+	m_UIManager->Update(elapsedTime);
 }
 
 //描画処理
@@ -63,12 +66,7 @@ void TitleScene::render()
 
 	// 2D 描画
 	{
-		titleImage->render(dc,
-			0, 0, mgr->getScreenWidth(), mgr->getScreenHeight(),
-			1, 1, 1, 1,
-			0,
-			0, 0, 1280, 720
-		);
+		m_UIManager->Render(dc);
 	}
 
 	// サーバーと接続

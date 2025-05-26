@@ -45,11 +45,6 @@ Player::~Player()
 //更新処理
 void Player::update(float elapsedTime)
 {
-	if (!move_b) {
-		updateTransform();
-		return;
-	}
-
 	if (!isPlayAnimation())
 	{
 		playAnimation(0, true);
@@ -179,21 +174,14 @@ DirectX::XMFLOAT3 Player::getMoveVec()const
 
 void Player::InputMove(float elapsedTime)
 {
-	if (!isOnLadder)
-	{
-		//進行ベクトル取得
-		DirectX::XMFLOAT3 moveVec = getMoveVec();
+	//進行ベクトル取得
+	DirectX::XMFLOAT3 moveVec = getMoveVec();
 
-		//移動処理
-		Move(moveVec.x, moveVec.z, moveSpeed);
+	//移動処理
+	Move(moveVec.x, moveVec.z, moveSpeed);
 
-		//旋回処理
-		turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
-	}
-	else
-	{
-		Move(0, 0, 0);
-	}
+	//旋回処理
+	turn(elapsedTime, moveVec.x, moveVec.z, turnSpeed);
 }
 
 //プレイヤーと敵との衝突判定
@@ -317,8 +305,8 @@ void Player::collisionPlayerAndEnemies()
 void Player::inputAction()
 {
 	GamePad* gamePad = InputManager::instance()->getGamePad();
-	if (gamePad->getButtonDown() & GamePad::BTN_X) Key_c();
-	if (gamePad->getButtonDown() & GamePad::BTN_Y) Key_v();
+	//if (gamePad->getButtonDown() & GamePad::BTN_X) Key_c();
+	//if (gamePad->getButtonDown() & GamePad::BTN_Y) Key_v();
 	if (gamePad->getButtonDown() & GamePad::BTN_A) Key_z();
 	if (gamePad->getButtonDown() & GamePad::BTN_B) Key_x();
 }
@@ -329,11 +317,55 @@ void Player::JumpAction()
 	//ジャンプ
 	jumpCount++;
 	if (jumpCount <= jumpLimit) jump(jumpSpeed);
+	playAnimation(5, false);
 }
 
 void Player::Attack()
 {
+	// 最も近い敵を取得
+	Enemy* enemy = EnemyManager::instance()->searchEnemy(&position);
+	if (!enemy) return;
+
+	DirectX::XMFLOAT3 enemyPos = *enemy->getPosition();
+
+	// プレイヤー → 敵方向ベクトル
+	float dx = enemyPos.x - position.x;
+	float dz = enemyPos.z - position.z;
+
+	float length = sqrtf(dx * dx + dz * dz);
+	if (length < 0.0001f) return;
+
+	dx /= length;
+	dz /= length;
+
+	// プレイヤーの前方向（angle.y による）
+	DirectX::XMFLOAT3 forward = Mathf::GetForwardDirection(angle.y);
+
+	// 内積でcosθを計算（前方向と敵方向）
+	float dot = forward.x * dx + forward.z * dz;
+
+	// 閾値（例：±45度以内にいる敵だけ許可 → cos(45°) ≒ 0.707）
+	const float thresholdCos = cosf(DirectX::XMConvertToRadians(45.0f));
+
+	// 攻撃アニメーション再生（常に）
 	playAnimation(7, false);
+
+	// 扇の中に敵がいれば、ダッシュ
+	if (dot >= thresholdCos)
+	{
+		//向きは常に敵に向ける
+		angle.y = atan2f(dx, dz);
+
+		// ダッシュ速度
+		float dashSpeed = 10.0f;
+		velocity.x = dx * dashSpeed;
+		velocity.z = dz * dashSpeed;
+	}
+}
+
+//攻撃しながら後方にステップする処理
+void Player::BackStepAttack()
+{
 }
 
 //

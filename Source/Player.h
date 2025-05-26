@@ -35,8 +35,11 @@ public:
 	void InputMove(float elapsedTime);
 
 	//アクション
-	void JumpAction();
-	void Attack();
+	void JumpAction();      //ジャンプ処理
+	void Attack();          //攻撃処理
+	void BackStepAttack();  //後退処理
+	void MoveBehindEnemy();	//敵の背後に移動する処理
+
 	//void FlyingStraightBullet();
 	//void FlyingHomingBullet();
 
@@ -82,13 +85,7 @@ private:
 	std::function<void()> Key_z;
 	std::function<void()> Key_x;
 
-	bool isOnLadder;
-
 	int attack_count = 0;
-
-	bool IsGoal = false;//true...ゴールした
-
-	bool move_b = true;//true...プレイヤーが動ける
 };
 
 enum class NodeState

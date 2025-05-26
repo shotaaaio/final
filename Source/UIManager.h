@@ -7,15 +7,12 @@ public:
 	UIManager(){}
 	~UIManager(){}
 
-	void Initialize();
-	void Update(float elapsedTime);
-	void Render(ID3D11DeviceContext* dc);
-	void AddUI(std::unique_ptr<UI>ui);//“Á’è‚ÌUI‚¾‚¯‚ğŠO•”‚©‚ç“o˜^‚·‚éŠÖ”
-	//ˆÈ‰º‚Ì‚æ‚¤‚É“o˜^
-	//UIManager uiManager;
-	//uiManager.AddUI(std::make_unique<HPGaugeUI>());
-	//uiManager.AddUI(std::make_unique<TimeDisplayUI>());
-	//uiManager.Initialize(); // ’Ç‰ÁŒã‚É‰Šú‰»
+	void Initialize();                         //‰Šú‰»
+	void Update(float elapsedTime);            //XV
+	void Render(ID3D11DeviceContext* dc);      //•`‰æ
+	void AddUI(std::shared_ptr<UIComponent>ui);//ŠeUI‚ğŠO•”‚©‚ç“o˜^‚·‚éŠÖ”
+
 private:
-	std::vector<std::unique_ptr<UI>>m_uiElements;
+	//Še’ŠÛƒNƒ‰ƒX‚Ì”‚ğæ“¾‚·‚éˆ×‚Ìƒƒ“ƒo•Ï”
+	std::vector<std::shared_ptr<UIComponent>>m_uiElements;
 };

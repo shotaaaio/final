@@ -6,8 +6,8 @@
 class HPGaugeUI : public UIComponent
 {
 public:
-    HPGaugeUI() = default;
-    ~HPGaugeUI() override = default;
+    HPGaugeUI() {};
+    ~HPGaugeUI() override {};
 
     void Initialize() override;
     void Update(float elapsedTime) override;
@@ -26,8 +26,8 @@ private:
 class TimeDisplayUI : public UIComponent
 {
 public:
-    TimeDisplayUI() = default;
-    ~TimeDisplayUI() override = default;
+    TimeDisplayUI() {};
+    ~TimeDisplayUI() override {};
 
     void Initialize() override;
     void Update(float elapsedTime) override;
@@ -60,8 +60,8 @@ private:
 class ActionButtonsUI : public UIComponent
 {
 public:
-    ActionButtonsUI() = default;
-    ~ActionButtonsUI() override = default;
+    ActionButtonsUI() {};
+    ~ActionButtonsUI() override {};
 
     void Initialize() override;
     void Update(float elapsedTime) override;

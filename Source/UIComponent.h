@@ -6,8 +6,8 @@
 class UIComponent
 {
 public:
-    UIComponent() = default;
-    virtual ~UIComponent() = default;
+    UIComponent() {};
+    virtual ~UIComponent() {};
 
     virtual void Initialize() = 0;
     virtual void Update(float elapsedTime) = 0;

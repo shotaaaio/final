@@ -32,7 +32,6 @@ public:
 
 	// 描画処理
 	void render()override;
-
 	
 private:
 	//敵ライフゲージ描画
@@ -44,6 +43,7 @@ private:
 
 	//タッチによる敵の出現
 	void enemyPlacementByTouch(ID3D11DeviceContext* dc, float elapsedTime);
+
 private:
 	// シーン定数
 	struct SceneConstants
@@ -68,7 +68,7 @@ private:
 	GaussianFilterData gaussianFilterData;        //暈し
 	LumianceExtractionData lumianceExtractionData;//ブルーム
 
-	//オフスクリーンレンダリング用描画ターゲット
+	////オフスクリーンレンダリング用描画ターゲット
 	std::unique_ptr<RenderTarget> renderTarget;
 
 	//ポストプロセス

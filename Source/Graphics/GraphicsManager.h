@@ -6,6 +6,8 @@
 #include "LineRenderer.h"
 #include "Buffer.h"
 #include "Shader.h"
+#include "TrailShader.h"
+#include "Camera.h"
 enum class SAMPLER_STATE
 {
 	POINT,
@@ -83,6 +85,22 @@ struct GlitchData
     float rect_noise_strength; //ノイズ強度（0〜1）
 };
 
+//軌跡用データ
+struct TrailData
+{
+	DirectX::XMFLOAT4X4 view;      //ビュー行列
+	DirectX::XMFLOAT4X4 projection;//プロジェクション行列
+	float time;                  //時間ベースの動きや揺らぎ      
+	float trailWidth;            //歪みエリアの広がり
+	float hueOffset;             //色相揺らぎオフセット
+	float alphaStart;            //歪み強さのグラデーション制御(軌跡の根本側での効果の強さ)
+	float alphaEnd;             //歪み強さのグラデーション制御(軌跡の先端側での効果の強さ)
+	float distortionPower;       //歪みの強さ
+	float noiseAmount;           //ノイズの振幅や強さ（タイムベース揺らぎ、炎やエネルギー風っぽさ）
+	float dummy;               // 12バイト (16バイトアラインメントのため)
+};
+
+
 enum class SpriteShaderID
 {
 	Default,
@@ -104,6 +122,10 @@ struct RenderContext
 	Microsoft::WRL::ComPtr<ID3D11BlendState> blendStates[4];
 	// ラスタライザステート
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStates[4];
+	
+	const Camera* camera;
+	
+	TrailData swordTrailData;
 
 	GlitchData glitchData;
 
@@ -154,7 +176,4 @@ private:
 
 	std::unique_ptr<DebugRenderer> debugRenderer;
 	std::unique_ptr<LineRenderer> lineRenderer;
-
-	float	screenWidth;
-	float	screenHeight;
 };

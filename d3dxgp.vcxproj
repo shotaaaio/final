@@ -210,6 +210,7 @@
     <ClCompile Include="Source\Graphics\Skymap.cpp" />
     <ClCompile Include="Source\Graphics\Sprite.cpp" />
     <ClCompile Include="Source\Graphics\Texture.cpp" />
+    <ClCompile Include="Source\HitStop.cpp" />
     <ClCompile Include="Source\HomingBullet.cpp" />
     <ClCompile Include="Source\Input\GamePad.cpp" />
     <ClCompile Include="Source\Input\InputManager.cpp" />
@@ -272,6 +273,7 @@
     <ClInclude Include="Source\Graphics\Texture.h" />
     <ClInclude Include="Source\Graphics\GaussianBlurShader.h" />
     <ClInclude Include="Source\high_resolution_timer.h" />
+    <ClInclude Include="Source\HitStop.h" />
     <ClInclude Include="Source\HomingBullet.h" />
     <ClInclude Include="Source\Input\GamePad.h" />
     <ClInclude Include="Source\Input\InputManager.h" />
@@ -293,6 +295,7 @@
     <ClInclude Include="Source\SceneTitleUI.h" />
     <ClInclude Include="Source\Stage.h" />
     <ClInclude Include="Source\StageManager.h" />
+    <ClInclude Include="Source\StateMachine.h" />
     <ClInclude Include="Source\StraightBullet.h" />
     <ClInclude Include="Source\TitleScene.h" />
     <ClInclude Include="Source\UIComponent.h" />

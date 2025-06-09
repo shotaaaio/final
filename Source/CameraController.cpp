@@ -64,11 +64,6 @@ DirectX::XMFLOAT3 CameraController::computeEye(float rot)
 	eye.y = target.y - front.y * range;
 	eye.z = target.z - front.z * range;
 
-	//DirectX::XMFLOAT3 dir = Mathf::GetForwardDirection(rot);
-	///*eye.x += sinf(rot * DirectX::XM_PI);
-	//eye.z += -cosf(rot * DirectX::XM_PI);*/
-	//angle.y = atan2f(dir.x, dir.z);
-
 	return eye;
 }
 

@@ -96,7 +96,6 @@ void GameScene::initialize()
 		//srvData.height = renderTarget->GetHeight();
 		//postprosessingRenderer->SetSceneData(srvData);
 	}
-
 }
 
 // 終了処理
@@ -268,19 +267,24 @@ void GameScene::render()
 
 	// 2D 描画
 	{
-		RenderEnemyGauge(dc, *view, *proj);
+		//postprosessingRenderer->Render(dc);
+		//RenderEnemyGauge(dc, *view, *proj);
 		RenderContext rc;
 
 		SpriteShader* gaussianShader = graphics->GetShader(SpriteShaderID::GaussianBlur);
 		SpriteShader* glitchShader = graphics->GetShader(SpriteShaderID::Glitch);
 		SpriteShader* luminanceShader = graphics->GetShader(SpriteShaderID::LuminanceExtraction);
+		
+		//rc.gaussianFilterData = gaussianFilterData;
+		//rc.gaussianFilterData.textureSize.x = renderTarget->GetWidth();
+		//rc.gaussianFilterData.textureSize.y = renderTarget->GetHeight();
 
-		glitchShader->Begin(dc);
+		/*glitchShader->Begin(dc);
 		rc.glitchData = glitchData;
 		glitchShader->Draw(dc, rc, hp.get());
-		glitchShader->End(dc);
+		glitchShader->End(dc);*/
 
-	/*	rc.gaussianFilterData = gaussianFilterData;
+		/*rc.gaussianFilterData = gaussianFilterData;
 		rc.gaussianFilterData.textureSize.x = hp->getTextureWidth();
 		rc.gaussianFilterData.textureSize.y = hp->getTextureHeight();
 		rc.luminanceExtractionData = lumianceExtractionData;
@@ -382,10 +386,15 @@ void GameScene::render()
 			{
 				if (ImGui::TreeNode("Player3D"))
 				{
-					DirectX::XMFLOAT3 eye = *(camera->getEye());
 					player->drawDebugGui();
-					ImGui::SliderFloat3("options", &options.x, -5.0f, 5.0f);
-					ImGui::InputFloat3("camera position", &eye.x);
+
+					// カメラ位置の編集
+					DirectX::XMFLOAT3 eye = *(camera->getEye());
+					if (ImGui::InputFloat3("camera position", &eye.x)) {
+						// 値が変更されたらカメラに反映
+						camera->setEye(&eye);
+					}
+
 					ImGui::SliderFloat("damp", &damp, 2.0f, 5.0f);
 					ImGui::TreePop();
 				}

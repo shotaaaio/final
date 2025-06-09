@@ -46,20 +46,11 @@
     <Filter Include="HLSL\GlitchEffect">
       <UniqueIdentifier>{962b39d1-7d34-4478-80a8-68a18022c2e9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Graphics\GlitchEffectShader">
-      <UniqueIdentifier>{860a21d6-0c17-4014-a799-58661d46622b}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HLSL\GaussianBlur">
       <UniqueIdentifier>{f51b988c-18b4-41b2-a04f-2ccc827e62c4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source\Graphics\GaussianBlurShader">
-      <UniqueIdentifier>{ddfdf3b0-c994-457c-865e-ca97c012e159}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HLSL\LiminanceExtraction">
       <UniqueIdentifier>{6cb51eb8-5e9c-40e5-8d3d-b00646b829c6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source\Graphics\LuminanceExtractionShader">
-      <UniqueIdentifier>{1c6471d4-80b9-4d58-88d2-b89e45d57b8b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source\UI elements">
       <UniqueIdentifier>{eaba9093-8b4a-4484-b19e-e446349dbfca}</UniqueIdentifier>
@@ -69,6 +60,24 @@
     </Filter>
     <Filter Include="Source\UI elements\UI">
       <UniqueIdentifier>{d9955014-0eab-436b-99ef-0ff21e2e6c5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\State">
+      <UniqueIdentifier>{03a6925d-b498-4834-86bf-528ae4243016}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Shader\GaussianBlurShader">
+      <UniqueIdentifier>{ddfdf3b0-c994-457c-865e-ca97c012e159}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Shader\GlitchEffectShader">
+      <UniqueIdentifier>{860a21d6-0c17-4014-a799-58661d46622b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Shader\LuminanceExtractionShader">
+      <UniqueIdentifier>{1c6471d4-80b9-4d58-88d2-b89e45d57b8b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Shader\TraiShader">
+      <UniqueIdentifier>{30603459-22d0-456d-bd20-735169456a84}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HLSL\Trail">
+      <UniqueIdentifier>{1862b339-07fd-4bd6-98fd-0b3d1691db4a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -116,9 +125,6 @@
     </ClCompile>
     <ClCompile Include="Utils\imgui\imgui_widgets.cpp">
       <Filter>Utils\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Graphics\ShaderManager.cpp">
-      <Filter>Source\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Texture.cpp">
       <Filter>Source\Graphics</Filter>
@@ -214,13 +220,13 @@
       <Filter>Source\Manager</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\SpriteGlitch.cpp">
-      <Filter>Source\Graphics\GlitchEffectShader</Filter>
+      <Filter>Source\Shader\GlitchEffectShader</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\GaussianBlurShader.cpp">
-      <Filter>Source\Graphics\GaussianBlurShader</Filter>
+      <Filter>Source\Shader\GaussianBlurShader</Filter>
     </ClCompile>
     <ClCompile Include="Source\LuminanceExtractionShader.cpp">
-      <Filter>Source\Graphics\LuminanceExtractionShader</Filter>
+      <Filter>Source\Shader\LuminanceExtractionShader</Filter>
     </ClCompile>
     <ClCompile Include="Source\PostprocessingRenderer.cpp">
       <Filter>Source</Filter>
@@ -243,6 +249,10 @@
     <ClCompile Include="Source\BossEnemy.cpp">
       <Filter>Source\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\ShaderManager.cpp">
+      <Filter>Source\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\HitStop.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Framework.h">
@@ -295,9 +305,6 @@
     </ClInclude>
     <ClInclude Include="Utils\imgui\imstb_truetype.h">
       <Filter>Utils\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Graphics\ShaderManager.h">
-      <Filter>Source\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\Texture.h">
       <Filter>Source\Graphics</Filter>
@@ -402,16 +409,16 @@
       <Filter>Source\Manager</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\SpriteGlitch.h">
-      <Filter>Source\Graphics\GlitchEffectShader</Filter>
+      <Filter>Source\Shader\GlitchEffectShader</Filter>
     </ClInclude>
     <ClInclude Include="Source\Graphics\GaussianBlurShader.h">
-      <Filter>Source\Graphics\GaussianBlurShader</Filter>
+      <Filter>Source\Shader\GaussianBlurShader</Filter>
     </ClInclude>
     <ClInclude Include="Source\Utilities.h">
       <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="Source\LuminanceExtractionShader.h">
-      <Filter>Source\Graphics\LuminanceExtractionShader</Filter>
+      <Filter>Source\Shader\LuminanceExtractionShader</Filter>
     </ClInclude>
     <ClInclude Include="Source\PostprocessingRenderer.h">
       <Filter>Source</Filter>
@@ -422,7 +429,6 @@
     <ClInclude Include="Source\obj.h">
       <Filter>Source</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\Shader.h" />
     <ClInclude Include="Source\UIManager.h">
       <Filter>Source\UI elements\UI</Filter>
     </ClInclude>
@@ -437,6 +443,18 @@
     </ClInclude>
     <ClInclude Include="Source\BossEnemy.h">
       <Filter>Source\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\StateMachine.h">
+      <Filter>Source\State</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shader.h">
+      <Filter>Source\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ShaderManager.h">
+      <Filter>Source\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\HitStop.h">
+      <Filter>Source</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

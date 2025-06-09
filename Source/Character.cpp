@@ -309,13 +309,16 @@ void Character::updateHorizontalMove(float elapsedTime)
 
 void Character::updateAnimation(float elapsedTime)
 {
+	//アニメーション速度倍率
+	float animationSpeed = elapsedTime * hitStop->GetMotionSpeed();
+	
 	if (animation_index >= 0)
 	{
 		//ブレンド率の計算
 		float blendRate = 1.0f;
 		if (animationBlendTime < animationBlendTime)
 		{
-			animationBlendTime += elapsedTime;
+			animationBlendTime += animationSpeed;
 			if (animationBlendTime >= animationBlendSeconds)
 			{
 				animationBlendTime = animationBlendSeconds;
@@ -325,7 +328,6 @@ void Character::updateAnimation(float elapsedTime)
 			//二次関数的に補完をする
 			blendRate *= blendRate;
 		}
-
 
 		//ブレンド補完
 		if (blendRate < 1.0f)
@@ -370,7 +372,7 @@ void Character::updateAnimation(float elapsedTime)
 			else
 			{
 				if (animationEndFlag == false)
-					animation_tick += elapsedTime;
+					animation_tick += animationSpeed;
 			}
 			keyframe = animation.sequence.at(frame_index);
 
@@ -379,7 +381,7 @@ void Character::updateAnimation(float elapsedTime)
 	}
 }
 
-void Character::playAnimation(int index, bool loop, float blendRate)
+void Character::playAnimation(int index, bool loop, float blendRate = 0.2f)
 {
 	animation_index = index;
 	animation_tick = 0.0f;

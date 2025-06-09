@@ -2,12 +2,13 @@
 #include"Object.h"
 #include<memory>
 #include"StageManager.h"
+#include "HitStop.h"
 
 //キャラクター
 class Character : public Object
 {
 public:
-	Character() {};
+	Character() { hitStop = std::make_unique<HitStop>(); };
 	virtual ~Character(){}
 
 	//半径の取得
@@ -28,6 +29,7 @@ public:
 	//速度取得
 	DirectX::XMFLOAT3 getVelocity() { return velocity; }
 
+	
 	/// <summary>
 	/// ダメージ処理
 	/// </summary>
@@ -37,8 +39,20 @@ public:
 	bool applyDamage(int damage, float invincibleTime = 0.5f);
 
 	//衝撃を与える
-	void addImpulse(const DirectX::XMFLOAT3& impulse);
+
+	//アニメーション中か
+	bool isPlayAnimation() const;
+
 protected:
+	void addImpulse(const DirectX::XMFLOAT3& impulse);
+
+	//アニメーション更新
+	void updateAnimation(float elapsedTime);
+
+	//アニメーション開始
+	void playAnimation(int index, bool loop, float blendRate);
+
+
 	//速度処理更新
 	void updateVelocity(float elapsedTime);
 
@@ -53,6 +67,7 @@ protected:
 
 	//水平移動更新処理
 	void updateHorizontalMove(float elapsedTime);
+
 
 	//着地したときに呼び出される
 	virtual void onLanding(){}
@@ -118,13 +133,6 @@ protected:
 	//傾斜率(デフォルト = 1.0f)
 	float slopeRate = 1.0f;
 
-	//アニメーション更新
-	void updateAnimation(float elapsedTime);
-	//アニメーション再生
-	void playAnimation(int index, bool loop, float blendRate = 0.2f);
-	//アニメーション再生中か
-	bool isPlayAnimation()const;
-
 	//アニメーション番号
 	int animation_index = 1;
 	animation::keyframe keyframe;
@@ -143,4 +151,6 @@ protected:
 
 	//アニメーションブレンドの時間
 	float animationBlendSeconds = 0.0f;
+
+	std::unique_ptr<HitStop>hitStop;
 };
